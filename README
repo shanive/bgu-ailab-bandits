@@ -1,1 +1,6 @@
-bandits
+The bgu-ailab-bandits project created in order to test the quality of algorithms for the bandit problem.
+
+the problem:
+
+Given a bandit with N arms, in which every pulling of an arm returns 1 or 0,
+find the best arm. Meaning, the arm with the best average of pullings with the result 1.   
