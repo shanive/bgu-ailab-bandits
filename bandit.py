@@ -22,7 +22,11 @@ class Bandit:
 	"simulation of a bandit"
 
 	def __init__(self, averageList):
+		#initialize bandit's arms
 		self.arms = [Arm(average) for average in averageList]
+		#calculate the best arm average:
+		self.bestArmAverage = max(averageList)
+		
 
 	def pullArm(self, armNum):
 		"""pulls the bandit's arm in the given index"""
@@ -32,17 +36,10 @@ class Bandit:
 		"""returns the numbers of arm in bandit"""
 		return len(self.arms)
 	
-	def getArmAverage(self, armNum):
-		"""return the average of the arm in the given index"""
-		return self.arms[armNum].getAverage()
-	
-	def bestAvg(self):
-		"""returns the average of the arm with the bigger average"""
-		biggestAvg = self.getArmAverage(0)
-		for arm in range(1, self.getArmsNum()):
-			if self.getArmAverage(arm) > biggestAvg:
-				biggestAvg = self.getArmAverage(arm)
-		return biggestAvg
+	def calcRegret(self, armIndex):
+		"""returns the regret of the arm in the given index"""
+		regret = self.bestArmAverage - self.arms[armIndex].getAverage()
+		return regret
 
 def _test_arm():
 	one = Arm(2)
@@ -59,7 +56,9 @@ _test()
 if __name__ == "__main__":
 	averages = [0.4, 0.7, 0.1, 0.6]
 	semiBandit = Bandit(averages)
+	
 	for i in range(0, 4):
-		print str(semiBandit.pullArm(i))
+		print str(semiBandit.calcRegret(i))
+		#print str(semiBandit.pullArm(i))
 
 

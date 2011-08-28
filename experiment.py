@@ -1,7 +1,9 @@
  #!/usr/bin/python
- 
+ #argecho.py
+import sys 
 import bandit
 import random
+import algorithms
  
 def myAlgo(resultList):
 	""" receives a lists of arm pulling results and return a number of arm to pull
@@ -12,65 +14,110 @@ def myAlgo(resultList):
 	return rand
  
 def findBestArm(resultsList):
-	"""returns the average of the best arm according to results in resultsList"""
+	"""returns the Index of the best arm according to results in resultsList"""
 	bestAvg = -1
+	bestArmIndex = -1
 	for arm in range (len(resultsList)):
 		if resultsList[arm]: 
-			tempAvg = float(resultsList[arm].count(1)) / len(resultsList[arm]) #compute the average of the i'th arm.
+			tempAvg = float(resultsList[arm].count(1)) / len(resultsList[arm]) #compute the average of the i'th arm according to results
 			if tempAvg > bestAvg:
 				bestAvg = tempAvg
-	return bestAvg	
+				bestArmIndex = arm
+	return bestArmIndex	
  
-def experimentFunc(pullsNum, algorithem, bandit):
-	"""excecute the experiment with pullsNum number of arm pulls according to the givem algorithem
-	returns the average of the best arm"""
-
+def experimentFunc(pullsNum, algorithm, bandit):
+	"""excecute the experiment with pullsNum number of arm pulls according to the given algorithm.
+	returns the index of the best arm"""
 	 
 	resultsList = [[] for i in range(bandit.getArmsNum())] # the results of the pulls of every arm.
 	 
 	for pull in range (0, pullsNum):
-		arm = algorithem(resultsList)
-		pullResult = bandit.pullArm(arm)	 
+		arm = algorithm(resultsList)
+		
+		#print "the chosen arm is: "+str(arm)
+		
+		pullResult = bandit.pullArm(arm)
+			 
+		#print "pull result: "+str(pullResult)	 
+			 
 		resultsList[arm].append(pullResult)
-	print str(resultsList)
+		
+		#print "result list: " + str(resultsList)
+		
 	return findBestArm(resultsList)
+	
+def calcAverageRegret(pullsNum, repetitions, algorithm, bandit):
+	""" execute experimentFunc for a given repetitions num and return the average regret"""
+	# initialize sum of the regrets in all repetitions
+	
+	#print "pulls number: " + str(pullsNum)
+	
+	sumOfRegrets = 0.0 	 
+	# execute the experiment Function repetitions times
+	for repeat in range(repetitions):
+		bestArm = experimentFunc(pullsNum, algorithm, bandit)
+		
+		#print "best arm: " + str(bestArm)
+		
+		regret = bandit.calcRegret(bestArm)
+		
+		#print "regret: "+str(regret)
+		
+		sumOfRegrets += regret
+		
+		#print "sum of regrets: "+str(sumOfRegrets)
+		
+	#calculate average regret
+	avgRegret = float(sumOfRegrets) / repetitions
+	
+	#print "average regret: "+str(avgRegret)
+	
+	return avgRegret
 	 
+def printFirstLine():
+	"""prints the first line in table of results"""
+	print "%-20s %-10s" % ("samples", "regret")
 	
 def printResult(pulls, regret):
 	""" print the result in a table"""
-	print repr(pulls).rjust(10), repr(regret).rjust(5) 
+	print "%-20d %-10f" % (pulls, regret)
+	
+def readAvgFromFile(fileName):
+	"""returns a list of averages that was read from a given file"""
+	banditFile = open(fileName, 'r')
+	# string = banditFile.read()
+	avgList = []
+	for line in banditFile:
+		avgList.extend([float(num) for num in line.split()])
+	banditFile.close()
+	return avgList 
 	  
-	 
- 
- ################ help functions ##############
- 
- 
-if __name__ == "__main__":
-	 # from command-line:
-	 minPulls =  10              
-	 maxPulls = 10
-	 pullStep =  10
-	 repetitions = 3
-	 #algName =
-	 ## from file
-	 #averageList = 
-	 bandit = bandit.Bandit([0.4, 0.7, 0.1, 0.6])             ####### for tests #######
-	 print str(bandit.bestAvg())
-	 #bestArm  = experimentFunc(10, myAlgo, bandit)
-	 #print str(bestArm) 
-	  
-	 print  repr("samples").rjust(10), repr("regret").rjust(10)       ### first row in table
-	 pullsNum = minPulls
-	 while pullsNum <= maxPulls:
-		 
-		sumOfRegrets = 0 	#sum of the regrets in all repetitions 
-		for repeat in range(repetitions):
-			bestAvg = experimentFunc(pullsNum, myAlgo, bandit)
-	 		regret = bandit.bestAvg() - bestAvg
-			sumOfRegrets += regret
-		avgRegret = float(sumOfRegrets) / repetitions
+def experimentMainLoop(nimPulls,maxPulls, pullStep, repetitions, bandit):
+	"""the outer loop of the experiment"""
+	pullsNum = minPulls
+	while pullsNum <= maxPulls:
+		avgRegret = calcAverageRegret(pullsNum, repetitions, algorithms.greedy, bandit)          #### todo ####
 		printResult(pullsNum, avgRegret)
+		
 		pullsNum = pullsNum * pullStep 
+
+if __name__ == "__main__":
+	 # arguments from command-line:
+	if len(sys.argv) < 6:
+		print "Usage: python <exp.py> <bandit.txt> <min-pulls> <max-pulls> <pull-step> <repetitions>"
+		sys.exit(0)
+	avgFileName = sys.argv[1]
+	minPulls =  int(sys.argv[2])
+	maxPulls = int(sys.argv[3])
+	pullStep =  int(sys.argv[4])
+	repetitions = int(sys.argv[5])
+	## arguments from file
+	avgList = readAvgFromFile(avgFileName)
+	bandit = bandit.Bandit(avgList)
+		
+	printFirstLine()
+	
+	experimentMainLoop(minPulls, maxPulls, pullStep, repetitions, bandit)   
 		
  
 
