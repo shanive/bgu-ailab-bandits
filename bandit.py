@@ -40,7 +40,12 @@ class Bandit:
 		"""returns the regret of the arm in the given index"""
 		regret = self.bestArmAverage - self.arms[armIndex].getAverage()
 		return regret
-
+	
+def _test_bandit():
+	semiBandit = Bandit([0.1, 0.5, 0.2, 0.4])
+	assert semiBandit.calcRegret(0) == 0.4
+	assert semiBandit.calcRegret(2) == 0.3
+	
 def _test_arm():
 	one = Arm(2)
 	zero = Arm(-1)
@@ -50,15 +55,16 @@ def _test_arm():
 	
 def _test():
 	_test_arm()
+	_test_bandit()
 	
 _test()
 
-if __name__ == "__main__":
-	averages = [0.4, 0.7, 0.1, 0.6]
-	semiBandit = Bandit(averages)
+#if __name__ == "__main__":
+	#averages = [0.4, 0.7, 0.1, 0.6]
+	#semiBandit = Bandit(averages)
 	
-	for i in range(0, 4):
-		print str(semiBandit.calcRegret(i))
-		#print str(semiBandit.pullArm(i))
+	#for i in range(0, 4):
+		#print str(semiBandit.calcRegret(i))
+		##print str(semiBandit.pullArm(i))
 
 
