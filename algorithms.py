@@ -10,7 +10,17 @@ algorithms are:
   greedy -- 0.5-greedy"""
 
 from math import log, sqrt
-from random import random, randrange
+from random import random, randrange, randint
+
+
+	
+def randomized(resultList):
+	""" receives a lists of arm pulling results and return a number of arm to pull
+	just for testing"""
+	 
+	armsNum = len(resultList)-1
+	rand = randint(0, armsNum)
+	return rand
 
 def mean(v):
 	return sum(v)/len(v)
