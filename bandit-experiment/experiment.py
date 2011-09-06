@@ -6,11 +6,12 @@ import random
 import algorithms
 import logging
 import getopt
+import ../results-plot/plotCreator
 
 
 def usage():
 	"""prints the usage message"""
- 	print "Usage: python <exp.py> --min <min-pulls> --max <max-pulls> --step <pull-step> --repeat <repetitions> <bandit.txt> <algorithm-name> [algorithm-name]..."
+ 	print "Usage: python <exp.py> --min <min-pulls> --max <max-pulls> --step <pull-step> --repeat <repetitions> --plot <bandit.txt> <algorithm-name> [algorithm-name]..."
 
  
 def findBestArm(resultsList):
@@ -111,19 +112,28 @@ def readAvgFromFile(fileName):
 	  
 def experimentMainLoop(nimPulls,maxPulls, pullStep, repetitions, bandit, algorithms):
 	"""the outer loop of the experiment"""
+	plotData = [["samples"]]+[[algoname] for algoname in algorithms]	# matrix of regrets
+	
 	pullsNum = minPulls
 	
 	logging.info('Start experiment.') 
 	
 	while pullsNum <= maxPulls:
 		
+		plotData[0].append(pullsNum)
 		logging.info('Number of pulls: %f', pullsNum)
 		avgRegret = calcAverageRegret(pullsNum, repetitions, algorithms, bandit)          #### todo ####
+		
+		for algo in range(1, len(plotData)):
+			plotData[algo].append(avgRegret[algo - 1])
+		
 		printResult(pullsNum, avgRegret)
 		
 		pullsNum = pullsNum * pullStep 
 		
 	logging.info('Done experimant')
+	
+	return plotData
 	
 	
 if __name__ == "__main__":
@@ -136,9 +146,10 @@ if __name__ == "__main__":
 	maxPulls=10000
 	pullStep=2
 	repeatitions=1000
+	plot = False
 		
 	try:
-        	opts, args = getopt.getopt(sys.argv[1:], "", ["min=", "max=", "step=", "repeat="])
+        	opts, args = getopt.getopt(sys.argv[1:], "", ["min=", "max=", "step=", "repeat=", "plot"])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -151,6 +162,8 @@ if __name__ == "__main__":
 			pullStep = float(arg)
 		elif opt == '--repeat':
 			repeatitions = int(arg)
+		elif opt == '--plot'
+			plot = True
 			
 	avgFileName = args[0]
 	algoNames = args[1:] # may be few algorithms
@@ -161,6 +174,10 @@ if __name__ == "__main__":
 		
 	printFirstLine(algoNames)
 	
-	experimentMainLoop(minPulls, maxPulls, pullStep, repeatitions, bandit, algoNames)
+	plotData = experimentMainLoop(minPulls, maxPulls, pullStep, repeatitions, bandit, algoNames)
+	
+	if plot:
+		plotcreator = plotCreator.PlotCreator()
+		plotcreator.create(plotData, "plot.png")
 		
- 
+ 	
