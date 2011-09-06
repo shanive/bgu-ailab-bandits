@@ -11,14 +11,7 @@ import getopt
 def usage():
 	"""prints the usage message"""
  	print "Usage: python <exp.py> --min <min-pulls> --max <max-pulls> --step <pull-step> --repeat <repetitions> <bandit.txt> <algorithm-name> [algorithm-name]..."
-	
-def myAlgo(resultList):
-	""" receives a lists of arm pulling results and return a number of arm to pull
-	just for testing"""
-	 
-	armsNum = len(resultList)-1
-	rand = random.randint(0, armsNum)
-	return rand
+
  
 def findBestArm(resultsList):
 	"""returns the Index of the best arm according to results in resultsList"""

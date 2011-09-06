@@ -2,6 +2,11 @@ import sys
 import matplotlib.pyplot as plt
 import getopt
 import matplotlib.axes
+
+def usage():
+	"""prints the usage message"""
+	print "Usage: python resultsplot.py --logx <basex> --logy <basey> <input-file> <output-file>"
+	
 def readResults(filename):
 	"""reads results of experinent from a given file 
 	returns list of algorithms' name and results list"""
