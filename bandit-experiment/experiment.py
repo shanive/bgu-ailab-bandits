@@ -6,12 +6,13 @@ import random
 import algorithms
 import logging
 import getopt
-import ../results-plot/plotCreator
+sys.path.append("/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/results-plot")
+import plotCreator
 
 
 def usage():
 	"""prints the usage message"""
- 	print "Usage: python <exp.py> --min <min-pulls> --max <max-pulls> --step <pull-step> --repeat <repetitions> --plot <bandit.txt> <algorithm-name> [algorithm-name]..."
+ 	print "Usage: python <exp.py> --min <min-pulls> --max <max-pulls> --step <pull-step> --repeat <repetitions> --plot <output-file.png> <input-file.txt> <algorithm-name> [algorithm-name]..."
 
  
 def findBestArm(resultsList):
@@ -80,18 +81,35 @@ def calcAverageRegret(pullsNum, repetitions, algorithms, bandit):
 		
 	return avgRegrets
 	 
-def printFirstLine(algorithms):
-	"""prints the first line in table of results"""
-	strToPrint = "%-20s " % "samples"
-	for algo in algorithms:
-		strToPrint += "%-10s " % algo
-	print strToPrint
+#def printFirstLine(algorithms):
+	#"""prints the first line in table of results"""
+	#strToPrint = "%-20s " % "samples"
+	#for algo in algorithms:
+		#strToPrint += "%-10s " % algo
+	#print strToPrint
 	
-def printResult(samples, regrets):
-	""" print the result in a table"""
-	strToPrint = "%-20d " % samples
-	for regret in range(len(regrets)):
-		strToPrint += "%-10f " % regrets[regret]
+#def printResult(samples, regrets):
+	#""" print the result in a table"""
+	#strToPrint = "%-20d " % samples
+	#for regret in range(len(regrets)):
+		#strToPrint += "%-10f " % regrets[regret]
+	#print strToPrint
+	
+def printResults(results):
+	"""output a table of results"""
+	rows = len(results)	
+	cols = len(results[1])	
+	strToPrint = ""
+	# concatinate first line in table
+	for row in range(rows):
+		strToPrint += "%-10s " % results[row][0]
+	strToPrint += '\n' # new line
+	
+	for col in range(1, cols):
+		for row in range(rows):
+			strToPrint += "%-10f " % results[row][col]
+		strToPrint += '\n'
+	
 	print strToPrint
 	
 def readAvgFromFile(fileName):
@@ -112,7 +130,7 @@ def readAvgFromFile(fileName):
 	  
 def experimentMainLoop(nimPulls,maxPulls, pullStep, repetitions, bandit, algorithms):
 	"""the outer loop of the experiment"""
-	plotData = [["samples"]]+[[algoname] for algoname in algorithms]	# matrix of regrets
+	plotData = [["samples"]]+[[algoname] for algoname in algorithms]	# matrix of regrets, initialize first column
 	
 	pullsNum = minPulls
 	
@@ -127,29 +145,34 @@ def experimentMainLoop(nimPulls,maxPulls, pullStep, repetitions, bandit, algorit
 		for algo in range(1, len(plotData)):
 			plotData[algo].append(avgRegret[algo - 1])
 		
-		printResult(pullsNum, avgRegret)
+		#printResult(pullsNum, avgRegret) ##### todo ##### 
 		
 		pullsNum = pullsNum * pullStep 
 		
 	logging.info('Done experimant')
 	
 	return plotData
+		
+def makePlot(plotData, plotFile):
+	ploter = plotCreator.PlotCreator()
+	ploter.create(plotData, plotFile)
 	
 	
 if __name__ == "__main__":
 	 # arguments from command-line:
 		
 	logging.basicConfig(filename = 'experiment.log', level = logging.INFO)
+	
 	#defult values:	
 	
 	minPulls=10
 	maxPulls=10000
 	pullStep=2
 	repeatitions=1000
-	plot = False
+	plotFile = ""
 		
 	try:
-        	opts, args = getopt.getopt(sys.argv[1:], "", ["min=", "max=", "step=", "repeat=", "plot"])
+        	opts, args = getopt.getopt(sys.argv[1:], "", ["min=", "max=", "step=", "repeat=", "plot="])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -162,8 +185,8 @@ if __name__ == "__main__":
 			pullStep = float(arg)
 		elif opt == '--repeat':
 			repeatitions = int(arg)
-		elif opt == '--plot'
-			plot = True
+		elif opt == '--plot':
+			plotFile = arg
 			
 	avgFileName = args[0]
 	algoNames = args[1:] # may be few algorithms
@@ -172,12 +195,14 @@ if __name__ == "__main__":
 	avgList = readAvgFromFile(avgFileName)
 	bandit = bandit.Bandit(avgList)
 		
-	printFirstLine(algoNames)
+	#printFirstLine(algoNames) #####todo############# maybe redundant? 
 	
-	plotData = experimentMainLoop(minPulls, maxPulls, pullStep, repeatitions, bandit, algoNames)
+	results = experimentMainLoop(minPulls, maxPulls, pullStep, repeatitions, bandit, algoNames)
 	
-	if plot:
-		plotcreator = plotCreator.PlotCreator()
-		plotcreator.create(plotData, "plot.png")
+	printResults(results)
+	
+	if plotFile:
+		makePlot(results, plotFile)
+		
 		
  	
