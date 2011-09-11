@@ -4,7 +4,7 @@ import plotCreator
 
 def usage():
 	"""prints the usage message"""
-	print "Usage: python resultsplot.py --logx <basex> --logy <basey> --labelx <label-string> --labely <label-string> <input-file> <output-file>"
+	print 	"Usage:\n\tpython resultsplot.py --logx <basex> --logy <basey> --labelx <label-string> --labely <label-string> <input-file> <output-file>\n or\n\tplot([--logx, <basex>, --logy, <basey>, --labelx, <label-string>, --labely, <label-string>, <input-file>, <output-file>])"
 	
 def readResults(filename):
 	"""reads results of experinent from a given file 
@@ -30,8 +30,15 @@ def readResults(filename):
 	resultfile.close()
 	
 	return resultlist
+		
+		
+def plot(argList):
+	"""receives a list of arguments for ploting"""
 	
-if __name__ == '__main__':
+	if len(argList) < 2:
+		usage()
+		sys.exit(2)
+		
 	#default values
 	logx = 0
 	logy = 0
@@ -39,7 +46,7 @@ if __name__ == '__main__':
 	labely = "y"
 	
 	try:
-		opts, args = getopt.getopt(sys.argv[1:],"", ["logx=", "logy=", "labelx=", "labely="])
+		opts, args = getopt.getopt(argList ,"", ["logx=", "logy=", "labelx=", "labely="])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -54,9 +61,13 @@ if __name__ == '__main__':
 		elif opt == '--labely':
 			labely = arg
 	
-	plotcreator = plotCreator.PlotCreator() 
+	ploter = plotCreator.PlotCreator() 
 	resultlist = readResults(args[0])
-	plotcreator.create(resultlist, args[1],logx, logy, labelx, labely)
+	ploter.create(resultlist, args[1],logx, logy, labelx, labely)
  	
+	
+	
+if __name__ == '__main__':
+	plot(sys.argv[1:])
 	
 	

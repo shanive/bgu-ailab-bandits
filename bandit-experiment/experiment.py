@@ -1,7 +1,7 @@
  #!/usr/bin/python
  #argecho.py
 import sys 
-import bandit
+from bandit import Bandit
 import random
 import algorithms
 import logging
@@ -12,7 +12,7 @@ import plotCreator
 
 def usage():
 	"""prints the usage message"""
- 	print "Usage: python <exp.py> --min <min-pulls> --max <max-pulls> --step <pull-step> --repeat <repetitions> --plot <output-file.png> <input-file.txt> <algorithm-name> [algorithm-name]..."
+ 	print "Usage:\n\tpython <exp.py> --min <min-pulls> --max <max-pulls> --step <pull-step> --repeat <repetitions> --plot <output-file.png> <input-file.txt> <algorithm-name> [algorithm-name]...\nor\n\tbanditExperiment([--min, <min-pulls>, --max, <max-pulls>, --step, <pull-step>, --repeat, <repetitions>, --plot, <output-file.png>, <input-file.txt>, <algorithm-name>, [algorithm-name],...])"
 
  
 def findBestArm(resultsList):
@@ -81,19 +81,6 @@ def calcAverageRegret(pullsNum, repetitions, algorithms, bandit):
 		
 	return avgRegrets
 	 
-#def printFirstLine(algorithms):
-	#"""prints the first line in table of results"""
-	#strToPrint = "%-20s " % "samples"
-	#for algo in algorithms:
-		#strToPrint += "%-10s " % algo
-	#print strToPrint
-	
-#def printResult(samples, regrets):
-	#""" print the result in a table"""
-	#strToPrint = "%-20d " % samples
-	#for regret in range(len(regrets)):
-		#strToPrint += "%-10f " % regrets[regret]
-	#print strToPrint
 	
 def printResults(results):
 	"""output a table of results"""
@@ -128,7 +115,7 @@ def readAvgFromFile(fileName):
 	
 	return avgList 
 	  
-def experimentMainLoop(nimPulls,maxPulls, pullStep, repetitions, bandit, algorithms):
+def experimentMainLoop(minPulls,maxPulls, pullStep, repetitions, bandit, algorithms):
 	"""the outer loop of the experiment"""
 	plotData = [["samples"]]+[[algoname] for algoname in algorithms]	# matrix of regrets, initialize first column
 	
@@ -144,9 +131,7 @@ def experimentMainLoop(nimPulls,maxPulls, pullStep, repetitions, bandit, algorit
 		
 		for algo in range(1, len(plotData)):
 			plotData[algo].append(avgRegret[algo - 1])
-		
-		#printResult(pullsNum, avgRegret) ##### todo ##### 
-		
+
 		pullsNum = pullsNum * pullStep 
 		
 	logging.info('Done experimant')
@@ -154,12 +139,20 @@ def experimentMainLoop(nimPulls,maxPulls, pullStep, repetitions, bandit, algorit
 	return plotData
 		
 def makePlot(plotData, plotFile):
+	"""receives experiment results table and output file name 
+	
+	creates a file with plot of results.""" 
+	
 	ploter = plotCreator.PlotCreator()
 	ploter.create(plotData, plotFile)
 	
 	
-if __name__ == "__main__":
-	 # arguments from command-line:
+def banditExperiment(argsList):
+	"""receives list of arguments and perform the experiment"""
+	 
+	if len(argsList) < 2:
+		usage()
+		sys.exit(2)
 		
 	logging.basicConfig(filename = 'experiment.log', level = logging.INFO)
 	
@@ -172,10 +165,11 @@ if __name__ == "__main__":
 	plotFile = ""
 		
 	try:
-        	opts, args = getopt.getopt(sys.argv[1:], "", ["min=", "max=", "step=", "repeat=", "plot="])
+        	opts, args = getopt.getopt(argsList, "", ["min=", "max=", "step=", "repeat=", "plot="])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
+		
 	for opt, arg in opts:
 		if opt == '--min':
 			minPulls = int(arg)
@@ -193,16 +187,20 @@ if __name__ == "__main__":
 	
 	## arguments from file
 	avgList = readAvgFromFile(avgFileName)
-	bandit = bandit.Bandit(avgList)
+	bandit = Bandit(avgList)
 		
-	#printFirstLine(algoNames) #####todo############# maybe redundant? 
-	
 	results = experimentMainLoop(minPulls, maxPulls, pullStep, repeatitions, bandit, algoNames)
 	
 	printResults(results)
 	
 	if plotFile:
-		makePlot(results, plotFile)
+		makePlot(results, plotFile) 
+	
+	
+if __name__ == "__main__":
+	
+	banditExperiment(sys.argv[1:])	
+	
 		
 		
  	
