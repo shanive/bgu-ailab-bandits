@@ -1,55 +1,91 @@
-from random import randint
+from random import choice
 
-
-
+class Move:
+	"""Simulation of a move in SOS game.
+	Every move has value and color.
+	A move's color represents the move's state: gray = available, white = choosen by white player, black = choosen by black player"""
+	def __init__(self, value, color):
+		self.__value  = value
+		self.__color = color
+		
+	def setValue(self, value):
+		"""changes the move's value"""
+		self.__value = value 
+	
+	def setColor(self, color):
+		"""changes the move's color"""
+		self.__color = color
+		
+	def getValue(self):
+		return self.__value
+	
+	def getColor(self):
+		return self.__color
+		
 class SOS:
 	"Implementation of Sum Of Switches Game"
 	
 	def __init__(self, n):
 		"""Initialize SOS game,
-		receives the number of possible moves""" 
+		receives the number of possible moves (even number)""" 
 		self.__n = n
-		##Create an array of n moves. each move is a number between 0 to n-1:
-		self.__moves = [0 for i in range(n)]
+		
+				# initial values for moves
 		
 		
-			
-	def newGame(self, algorithm):
-		"""receive__s an algorithm to play the game
-		return the winner: 1 for white and 0 for black"""
+	def getn(self):
+		"""returns the number of moves"""
+		return self.__n
 	
-		self.__initMoves()		##initialize moves' values
-			
-		whiteScore = 0
-		blackScore = 0
+	def restartGame(self):
+		"""start a game with the same moves' values"""
+		for move in self.__moves:
+			move.setColor('gray')
 		
-		whiteMoves, blackMoves = algorithm(self.__n)
+			
+	def newGame(self):
+		"""starts a new game"""
 		
-		#compute white's score
-		for move in whiteMoves:
-			whiteScore += self.__moves[move]
-		#compute black's score
-		for move in blackMoves:
-			blackScore += self.__moves[move]	
-			
-		k = round(self.__n / 2.0)
-		if k > self.__n / 2.0:
-			k -= 1 
-		
-		if whiteScore - blackScore >= int(k):
-			return 1
-		else:
-			return 0
-			
-			
-	def __initMoves(self):
+		self.__moves = []
 				
-		src = [i for i in range(self.__n)]
+		src = [i for i in range(self.__n)]	#moves' values
 		
 		##initialize the moves' values:
 		for i in range(self.__n):
-			rand = randint(0, self.__n-1-i)
-			self.__moves[i] = src[rand]
-			src[rand], src[self.__n-1-i] = src[self.__n-1-i], src[rand]	#swap
+			value = choice(src)		#choose value randomly for move number i
+			move = Move(value, 'gray')
+			self.__moves.append(move)
+			src.remove(value)		#remove the value from values list to prevent duplicate values 
+			
+			
 		
+	def whiteMove(self, move):
+		"""add a given move number to white player's moves"""
+		self.__moves[move].setColor('white')
+		
+	def blackMove(self, move):
+		"""add a given move number to black player's moves"""
+		self.__moves[move].setColor('black')	
 
+	
+	def endGame(self):
+		"""return the distance between the white player's score and the black player's score"""
+		
+		whiteScore = 0
+		blackScore = 0
+		
+		for move in self.__moves:
+			if move.getColor() == 'white':
+				whiteScore += move.getValue() 	
+			else:
+				blackScore += move.getValue()
+				
+		return whiteScore - blackScore
+	
+	def availableMoves(self):
+		"""returns a list of unchoosen moves"""
+		grayMoves = []
+		for i in range(self.__n):
+			if self.__moves[i].getColor() == 'gray':
+				grayMoves.append(i)
+		return grayMoves

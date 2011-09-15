@@ -1,3 +1,5 @@
+ #!/usr/bin/python
+ #argecho.py
 import sys
 import getopt
 import plotCreator
@@ -17,12 +19,12 @@ def readResults(filename):
 	labels = lines[0].split()
 	 
 	resultlist = [[label] for label in labels] 
-	
 	lines = lines[1:]
 	 
 	for line in lines:
 		templist = line.split()
-		
+		if not templist:
+			continue
 		for col in range(len(resultlist)):
 				
 			resultlist[col].append(float(templist[col]))
