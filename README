@@ -1,6 +1,12 @@
-The bgu-ailab-bandits project created in order to test the quality of algorithms for the bandit problem.
-
-the problem:
-
-Given a bandit with N arms, in which every pulling of an arm returns 1 or 0,
-find the best arm. Meaning, the arm with the best average of pullings with the result 1.   
+Multi-armed-bandits related experiments and algorithms
+   (AI lab, Ben Gurion University of the Negev).
+  
+README             --- this file
+bandit-experiment/ --- simple bandit experiment on pure exploration
+SOS/               --- comparison of MCTS algorithms on the
+                       Sum-of-Switches game
+results-plot/      --- a small matplotlib-based module and a command-line
+                       utility to plot experiment results
+papers/            --- papers by others worth reading
+fuego-1.1/         --- a framework in C++ for experimenting with
+                       MCTS and the Go game
