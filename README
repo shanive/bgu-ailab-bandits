@@ -10,3 +10,5 @@ results-plot/      --- a small matplotlib-based module and a command-line
 papers/            --- papers by others worth reading
 fuego-1.1/         --- a framework in C++ for experimenting with
                        MCTS and the Go game
+
+More details at: https://github.com/shanive/bgu-ailab-bandits
