@@ -1,3 +1,4 @@
+"""this module contain the class SOSGame"""
 import sos
 
 class SOSGame:
@@ -5,8 +6,7 @@ class SOSGame:
 	'Simulation of SOS game between two players'
 	
 	def __init__(self, firstplayer, secondplayer, n, valOrder = 'r'):
-		"""receives two players and even number n a initial a game.
-		firstplayer starts to play first"""
+		"""receive two players and even number n a initial a game."""
 		self.white = firstplayer
 		self.black = secondplayer
 		self.game  = sos.Game(n, order = valOrder)
@@ -30,6 +30,6 @@ class SOSGame:
 		#self.__sos.restartGame()
 		
 	def changeSize(self, n, valOrder = 'r'):
-		"""starts a new game with size n"""	
+		"""change the size of the game for a given value n and a given values' order valOrder (optional)"""	
 		self.game = sos.Game(n, order = valOrder)
 	

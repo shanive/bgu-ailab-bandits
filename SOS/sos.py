@@ -1,14 +1,38 @@
+
+"""This module contain the classes State and Game"""
+
+
 from random import choice
 from random import shuffle
 
 class State:
+	
+	"""simulate a state of an sos game
+	
+	methods:
+	availableMoves() -- return list of unchoosen moves
+	whiteMove(i) -- choose move i to be white's move
+	blackMove(i) -- choose move i to be black's move
+	isFinalState() -- return true if there are no available moves
+	whites() -- return list of white's moves
+	blacks() -- return list of black's moves
+	"""
+	
 	GRAY = 0
 	WHITE = 1
 	BLACK = -1
 	
 	def __init__(self, n):
+		"""receive the number of moves in the game"""
 		self.colors = [State.GRAY] * n
-	
+		
+	def __copy__(self):
+		"""implementation of deepcopy,
+		returns a copy of the state for simulation"""
+		state = State(len(self.colors))
+		state.color = self.colors[:]
+		return state
+
 	def __someMoves(self, color):
 		return [i for i in range(len(self.colors)) if self.colors[i]==color]
 	
@@ -28,11 +52,26 @@ class State:
 	def blacks(self): return self.__someMoves(State.BLACK)
 
 class Game:
+	
+	"""Simulate an sos game.
+	
+	methods:
+	initialState() -- return a new sos game.
+	scoreBonus(state) -- receive a sos game state and return the score bonus of the game.
+	"""
+	
 	def __init__(self, n, values = None, order = 'r'):
+		"""initiate sos game of a given size.
+		
+		receive:
+		n -- game size
+		values -- values of moves (optional)
+		order -- order of moves' values"""
 		self.n = n
 		self.values = values or self.__initValues(order)
 		
 	def __initValues(self, order):
+		"""initiate moves' values according to a given order"""
 		values = range(self.n)
 		if order == 'u':    # U)p
 			pass # already in accending order
@@ -43,15 +82,15 @@ class Game:
 		return values
 	
 	def initialState(self):
-		"create an initial state of the game"
+		"""create an initial state of the game"""
 		return State(self.n)
 
 	def __score(self, indices):
-		"return total score of switches at the indices"
+		"""return total score of switches at the indices"""
 		return sum(self.values[i] for i in indices)
 	
 	def scoreBonus(self, state):
-		"compute game score bonus"
+		"""compute game score bonus"""
 		return self.__score(state.whites()) - self.__score(state.blacks())
 
 def test_game():

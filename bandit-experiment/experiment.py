@@ -82,20 +82,20 @@ def calcAverageRegret(pullsNum, repetitions, algorithms, bandit):
 	return avgRegrets
 	 
 	
-def printResults(results):
-	"""output a table of results"""
-	rows = len(results)	
-	cols = len(results[1])	
-	strToPrint = ""
-	# concatinate first line in table
-	for row in range(rows):
-		strToPrint += "%-10s " % results[row][0]
-	strToPrint += '\n' # new line
+#def printResults(results):
+	#"""output a table of results"""
+	#rows = len(results)	
+	#cols = len(results[1])	
+	#strToPrint = ""
+	## concatinate first line in table
+	#for row in range(rows):
+		#strToPrint += "%-10s " % results[row][0]
+	#strToPrint += '\n' # new line
 	
-	for col in range(1, cols):
-		for row in range(rows):
-			strToPrint += "%-10f " % results[row][col]
-		strToPrint += '\n'
+	#for col in range(1, cols):
+		#for row in range(rows):
+			#strToPrint += "%-10f " % results[row][col]
+		#strToPrint += '\n'
 	
 	print strToPrint
 	
@@ -118,6 +118,11 @@ def readAvgFromFile(fileName):
 def experimentMainLoop(minPulls,maxPulls, pullStep, repetitions, bandit, algorithms):
 	"""the outer loop of the experiment"""
 	plotData = [["samples"]]+[[algoname] for algoname in algorithms]	# matrix of regrets, initialize first column
+	####print first row in results table:
+	printRow = "%-10s " % "samples"
+	for algoname in algorithms:
+		printRow += "%-10s " % algoname
+	print printRow + "\n"
 	
 	pullsNum = minPulls
 	
@@ -125,13 +130,18 @@ def experimentMainLoop(minPulls,maxPulls, pullStep, repetitions, bandit, algorit
 	
 	while pullsNum <= maxPulls:
 		
+		printRow = "%-10d " % pullsNum
+		
 		plotData[0].append(pullsNum)
 		logging.info('Number of pulls: %f', pullsNum)
 		avgRegret = calcAverageRegret(pullsNum, repetitions, algorithms, bandit)          #### todo ####
 		
 		for algo in range(1, len(plotData)):
 			plotData[algo].append(avgRegret[algo - 1])
-
+			printRow += "%-10f " %  avgRegret[algo - 1]
+			
+		print printRow
+		
 		pullsNum = pullsNum * pullStep 
 		
 	logging.info('Done experimant')
@@ -191,7 +201,7 @@ def banditExperiment(argsList):
 		
 	results = experimentMainLoop(minPulls, maxPulls, pullStep, repeatitions, bandit, algoNames)
 	
-	printResults(results)
+	#printResults(results)
 	
 	if plotFile:
 		makePlot(results, plotFile) 
