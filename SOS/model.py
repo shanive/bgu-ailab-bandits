@@ -24,6 +24,7 @@ class State:
 	def __init__(self, n):
 		"""receive the number of moves in the game"""
 		self.colors = [State.GRAY] * n
+		self.turn = State.WHITE
 		
 	def __copy__(self):
 		"""implementation of deepcopy,
@@ -40,6 +41,12 @@ class State:
 	def __move(self, i, color):
 		assert self.colors[i]==State.GRAY
 		self.colors[i] = color
+		if self.turn==State.WHITE:
+			self.turn = State.BLACK
+		else:
+			self.turn = State.WHITE
+
+	def isWhiteTurn(self): return self.turn==State.WHITE
 
 	def whiteMove(self, i): self.__move(i, State.WHITE)
 	def blackMove(self, i): self.__move(i, State.BLACK)
