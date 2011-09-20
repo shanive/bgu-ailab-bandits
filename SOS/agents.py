@@ -41,4 +41,18 @@ class Right(Agent):
 		return moves[len(moves) - 1]
 
 
+class Uniform(Agent):
+	"""uniform MCTS player"""	
 	
+	def __init__(self, game, samples):
+		Agent.__init__(self, game)
+		self.samples = samples
+		
+	def selectMove(self, state):
+		"""receive the state of the game and return the next move"""
+		moves = state.availableMoves()
+		moveValues = [0.0 for move in moves]
+		### first sample each move:
+		copystate = state.copy(state)
+		for i in range(len(moves)):
+			simulate
