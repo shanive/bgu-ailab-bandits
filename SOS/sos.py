@@ -93,6 +93,17 @@ class Game:
 		"""compute game score bonus"""
 		return self.__score(state.whites()) - self.__score(state.blacks())
 
+class Agent:
+        "abstract agent"
+
+        def __init__(self, game):
+                self.game = game
+
+        def selectMove(self, state):
+                "select move based on the state of the game"
+                assert False, "selectMove not implemented for %s" % \
+                    self.__class__
+        
 def test_game():
 	game = Game(4, [3, 2, 0, 1])
 	state = game.initialState()
