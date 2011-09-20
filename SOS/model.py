@@ -139,6 +139,17 @@ class Game:
 		#"""change the size of the game for a given value n and a given values' order valOrder (optional)"""	
 		#self.game = sos.Game(n, order = valOrder)
 
+class Agent:
+        "abstract agent"
+
+        def __init__(self, game):
+                self.game = game
+
+        def selectMove(self, state):
+                "select move based on the state of the game"
+                assert False, "selectMove not implemented for %s" % \
+                    self.__class__
+        
 def test_game():
 	game = Game(4, [3, 2, 0, 1])
 	state = game.initialState()
