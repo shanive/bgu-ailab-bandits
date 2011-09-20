@@ -1,7 +1,6 @@
 
 """This module contain the classes State and Game"""
 
-
 from random import choice
 from random import shuffle
 
@@ -13,7 +12,7 @@ class State:
 	availableMoves() -- return list of unchoosen moves
 	whiteMove(i) -- choose move i to be white's move
 	blackMove(i) -- choose move i to be black's move
-	isFinalState() -- return true if there are no available moves
+	isFinal() -- return true if there are no available moves
 	whites() -- return list of white's moves
 	blacks() -- return list of black's moves
 	"""
@@ -45,9 +44,6 @@ class State:
 	def whiteMove(self, i): self.__move(i, State.WHITE)
 	def blackMove(self, i): self.__move(i, State.BLACK)
 		
-	def isFinalState(self):
-		return not self.availableMoves()
-	
 	def whites(self): return self.__someMoves(State.WHITE)
 	def blacks(self): return self.__someMoves(State.BLACK)
 
@@ -81,21 +77,23 @@ class Game:
 			shuffle(values)
 		return values
 	
-	#def initialState(self):
-		#"""create an initial state of the game"""
-		#return State(self.n)
+	def __initialState(self):
+		"""create an initial state of the game"""
+		return State(self.n)
 		
+	def isFinalState(self, state):
+		return not state.availableMoves()
+	
 	def play(self, firstPlayer, secondPlayer):
 		"""simulate a game for two players"""
-		state = State(self.n)
-		rounds = self.n / 2
-		for i in range(rounds):
-			move = firstPlayer(state.availableMoves())
+		state = self.__initialState()
+		while not self.isFinalState(state):
+			move = firstPlayer.selectMove(state)
 			state.whiteMove(move)
-			move = secondPlayer(state.availableMoves())
+			move = secondPlayer.selectMove(state)
 			state.blackMove(move)
 			
-		return state.scoreBonus(state)
+		return self.scoreBonus(state)
 		
 	def __score(self, indices):
 		"""return total score of switches at the indices"""
@@ -105,59 +103,23 @@ class Game:
 		"""compute game score bonus"""
 		return self.__score(state.whites()) - self.__score(state.blacks())
 	
-	
-#class Game:
-	
-	#'Simulation of SOS game between two players'
-	
-	
-	#def __init__(self, firstplayer, secondplayer, n, valOrder = 'r'):
-		#"""receive two players and even number n a initial a game."""
-		#self.white = firstplayer
-		#self.black = secondplayer
-		#self.game  = sos.Game(n, order = valOrder)
-		
-	#def newGame(self):
-		#"""simulate a new sos game between the two players"""
-		#state = self.game.initialState()
-		#turns = self.game.n/2
-		
-		#for i in range(turns):
-				#move = self.white(state.availableMoves())
-				#state.whiteMove(move)
-				#move = self.black(state.availableMoves())
-				#state.blackMove(move)
-				
-		#return self.game.scoreBonus(state)
-		 
-	
-	##def restart(self):
-		##"""start over the game"""
-		##self.__sos.restartGame()
-		
-	#def changeSize(self, n, valOrder = 'r'):
-		#"""change the size of the game for a given value n and a given values' order valOrder (optional)"""	
-		#self.game = sos.Game(n, order = valOrder)
+
 
 class Agent:
-        "abstract agent"
+        """abstract agent"""
 
         def __init__(self, game):
                 self.game = game
 
         def selectMove(self, state):
-                "select move based on the state of the game"
+                """select move based on the state of the game"""
                 assert False, "selectMove not implemented for %s" % \
                     self.__class__
         
-def test_game():
-	game = Game(4, [3, 2, 0, 1])
-	state = game.initialState()
-	state.whiteMove(2)
-	state.blackMove(0)
-	state.whiteMove(1)
-	state.blackMove(3)
-	assert game.scoreBonus(state) == -2
+#def test_game():
+	#game = Game(4, [3, 2, 0, 1])
+	#assert game.play(agents.Left(game), agents.Right(game)) == 4
+	 
 	
 def test_availableMoves():
 	state = State(4)
@@ -167,16 +129,17 @@ def test_availableMoves():
 	state.blackMove(0)
 	assert state.availableMoves()==[1,3]
 
-def test_isFinalState():
+def test_isFinal():
+	game = Game(4)
 	state = State(4)
 	
 	state.whiteMove(2)
 	state.blackMove(0)
-	assert not state.isFinalState()
+	assert not game.isFinalState(state)
 	
 	state.whiteMove(1)
 	state.blackMove(3)
-	assert state.isFinalState()
+	assert game.isFinalState(state)
 	
 def test_whites_blacks():
 	state = State(4)
@@ -190,12 +153,12 @@ def test_whites_blacks():
 	
 def test_state():
 	test_availableMoves()
-	test_isFinalState()
+	test_isFinal()
 	test_whites_blacks()
 	
 def test():
 	test_state()
-	test_game()
+	#test_game()
 	
 test()
 	
