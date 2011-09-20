@@ -81,10 +81,22 @@ class Game:
 			shuffle(values)
 		return values
 	
-	def initialState(self):
-		"""create an initial state of the game"""
-		return State(self.n)
-
+	#def initialState(self):
+		#"""create an initial state of the game"""
+		#return State(self.n)
+		
+	def play(self, firstPlayer, secondPlayer):
+		"""simulate a game for two players"""
+		state = State(self.n)
+		rounds = self.n / 2
+		for i in range(rounds):
+			move = firstPlayer(state.availableMoves())
+			state.whiteMove(move)
+			move = secondPlayer(state.availableMoves())
+			state.blackMove(move)
+			
+		return state.scoreBonus(state)
+		
 	def __score(self, indices):
 		"""return total score of switches at the indices"""
 		return sum(self.values[i] for i in indices)
@@ -92,6 +104,40 @@ class Game:
 	def scoreBonus(self, state):
 		"""compute game score bonus"""
 		return self.__score(state.whites()) - self.__score(state.blacks())
+	
+	
+#class Game:
+	
+	#'Simulation of SOS game between two players'
+	
+	
+	#def __init__(self, firstplayer, secondplayer, n, valOrder = 'r'):
+		#"""receive two players and even number n a initial a game."""
+		#self.white = firstplayer
+		#self.black = secondplayer
+		#self.game  = sos.Game(n, order = valOrder)
+		
+	#def newGame(self):
+		#"""simulate a new sos game between the two players"""
+		#state = self.game.initialState()
+		#turns = self.game.n/2
+		
+		#for i in range(turns):
+				#move = self.white(state.availableMoves())
+				#state.whiteMove(move)
+				#move = self.black(state.availableMoves())
+				#state.blackMove(move)
+				
+		#return self.game.scoreBonus(state)
+		 
+	
+	##def restart(self):
+		##"""start over the game"""
+		##self.__sos.restartGame()
+		
+	#def changeSize(self, n, valOrder = 'r'):
+		#"""change the size of the game for a given value n and a given values' order valOrder (optional)"""	
+		#self.game = sos.Game(n, order = valOrder)
 
 def test_game():
 	game = Game(4, [3, 2, 0, 1])
