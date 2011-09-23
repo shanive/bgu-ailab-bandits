@@ -54,6 +54,21 @@ class State:
 	def whites(self): return self.__someMoves(State.WHITE)
 	def blacks(self): return self.__someMoves(State.BLACK)
 
+        def id(self):
+                """returns unique identifier of the state,
+                used for gathering state/action statistics"""
+                n = 0
+                for c in self.colors:
+                        i = None
+                        if c==State.GRAY:
+                                i = 0
+                        elif c==State.WHITE:
+                                i = 1
+                        elif c==State.BLACK:
+                                i = 2
+                        n = n*3 + c
+                return n
+
 class Game:
 	
 	"""Simulate an sos game.
@@ -158,10 +173,25 @@ def test_whites_blacks():
 	assert state.whites()==[1,2]
 	assert state.blacks()==[0,3]
 	
+def test_state_id():
+        statea = State(32)
+        stateb = State(32)
+        statec = State(32)
+        statea.whiteMove(2)
+        statea.blackMove(30)
+        stateb.whiteMove(2)
+        stateb.blackMove(30)
+        statec.blackMove(2)
+        statec.whiteMove(30)
+        assert id(statea) != id(stateb) \
+            and statea.id()==stateb.id() \
+            and statea.id()!=statec.id()
+	
 def test_state():
 	test_availableMoves()
 	test_isFinal()
 	test_whites_blacks()
+        test_state_id()
 	
 def test():
 	test_state()
