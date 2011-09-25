@@ -24,7 +24,8 @@ class State:
         
         def __init__(self, n):
                 """receive the number of moves in the game"""
-                self.colors = [State.GRAY] * n
+                self.size = n
+                self.colors = [State.GRAY]*n
                 self.turn = State.WHITE
                 
         def __copy__(self):

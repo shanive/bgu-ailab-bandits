@@ -1,7 +1,8 @@
 """this module contain agents for sos game"""
 
 import sys
-from random import choice
+from random import random, choice
+from math import log, sqrt
 from model import *
 from copy import copy
 
@@ -68,33 +69,39 @@ class Stats(dict):
                         self[stateid] = dict((move, MoveStat()) for move in state.availableMoves())
                 return dict.__getitem__(self, stateid)
 
-def select_all_then_this(state, stats, select_this):
+def selectAllThenThis(state, stats, selectThis):
         """select an unvisited action if any,
         then according to select_this"""
         for move, stat in stats[state].items():
                 if not stat.count:
                         return move
-        return select_this(state, stats)
+        return selectThis(state, stats)
+
+def bestMove(state, stats):
+        """receive list of Move objects and return the index of the move
+        with the best average value"""
+        return reduce(lambda a, b: a[1].getAvgValue()>b[1].getAvgValue() and a or b,
+                      stats[state].items())[0]
 
 class MCTS(Agent):
         """uniform MCTS player"""
 
-        def __init__(self, game, samples, select_first, select_next=None):
+        def __init__(self, game, samples, selectFirst, selectNext=None):
                 Agent.__init__(self, game)
                 self.samples = samples
-                self.select_first = lambda state, stats: \
-                    select_all_then_this(state, stats, select_first)
-                self.select_next = lambda state, stats: \
-                    select_all_then_this(state, stats, select_next or select_first)
+                self.selectFirst = lambda state, stats: \
+                    selectAllThenThis(state, stats, selectFirst)
+                self.selectNext = lambda state, stats: \
+                    selectAllThenThis(state, stats, selectNext or selectFirst)
 
         def selectMove(self, state):
                 """receive the state of the game and return the next move"""
                 stats = Stats()
                 totalsamples = self.samples*len(state.availableMoves())
                 while totalsamples:
-                        value = self.__simulate(self.select_first, copy(state), stats)
+                        value = self.__simulate(self.selectFirst, copy(state), stats)
                         totalsamples-= 1
-                return self.__bestMove(stats[state])
+                return bestMove(state, stats)
 
         def __simulate(self, select, state, stats):
                 """simulate a game from a given state. return the score bonus"""
@@ -109,19 +116,13 @@ class MCTS(Agent):
                                 state.whiteMove(move)
                         else:
                                 state.blackMove(move)
-                        bonus = self.__simulate(self.select_next, state, stats)
+                        bonus = self.__simulate(self.selectNext, state, stats)
                         if isWhite:
                                 stat.updateValue(bonus) # white, max
                         else:
                                 stat.updateValue(-bonus) # black, min
                         return bonus
 
-        @staticmethod
-        def __bestMove(movestats):
-                """receive list of Move objects and return the index of the move
-                with the best average value"""
-                return reduce(lambda a, b: a[1].getAvgValue()>b[1].getAvgValue() and a or b,
-                              movestats.items())[0]
 
 class Uniform(MCTS):
         "Uniform Monte Carlo sampling"
@@ -129,8 +130,42 @@ class Uniform(MCTS):
                 MCTS.__init__(self, game, samples,
                               lambda state, stats: choice(state.availableMoves()))
 
+### adaptive selectors
+
+## 0.5-greedy
+
+def selectGreedy(state, stats):
+        """select best move with probability 0.5,
+        or another move with uniform probability"""
+        moves = state.availableMoves()
+        if len(moves)==1 or random() > 0.5 * len(moves)/(len(moves)-1):
+                return bestMove(state, stats)
+        else:
+                return choice(moves)
+
+## UCB
+
+def selectUCB(state, stats):
+        Cp = state.size**2 # approximate upper bound
+        totalcount = sum(stat.count for stat in stats[state].values())
+        A = 2.0*Cp*sqrt(log(totalcount))
+        def ucb(stat):
+                stat.getAvgValue()+A/sqrt(stat.count)
+        return reduce(lambda a, b: ucb(a[1])>ucb(b[1]) and a or b,
+                      stats[state].items())[0]
+
+class UCT(MCTS):
+        def __init__(self, game, samples):
+                MCTS.__init__(self, game, samples, selectUCB)
+
+class GCT(MCTS):
+        def __init__(self, game, samples):
+                MCTS.__init__(self, game, samples, selectGreedy, selectUCB)
+
+### Tests
+
 def test_bestMove():
-       assert 1==MCTS._MCTS__bestMove(dict([(0, MoveStat(3, 3)), (1, MoveStat(2, 1))]))
+       assert 1==bestMove(0, {0: dict([(0, MoveStat(3, 3)), (1, MoveStat(2, 1))])})
 
 def test():
         test_MoveStat()
