@@ -38,11 +38,11 @@ class Right(Agent):
 
 class Move:
         "A move in a simulated sos game"
-        def __init__(self, number):
-                """receive the move's number and initialize a new move"""
-                self.number = number
-                self.valuesum = 0.0
-                self.count = 0
+        def __init__(self, index, valuesum=0.0, count=0):
+                """receive the move's index and initialize a new move"""
+                self.index = index
+                self.valuesum = valuesum
+                self.count = count
 
         def updateValue(self, value):
                 """receive the value of the move on a simulation and update the overall value"""
@@ -53,7 +53,7 @@ class Move:
                 """return the average value of this move"""
                 return self.valuesum / self.count
 
-def __testMove():
+def test_Move():
         move = Move(3)
         move.updateValue(0.5)
         move.updateValue(0.3)
@@ -68,22 +68,23 @@ class Uniform(Agent):
 
         def selectMove(self, state):
                 """receive the state of the game and return the next move"""
-                availables = state.availableMoves()
-                moves = [Move(move) for move in availables]
+                moves = [Move(index) for index in state.availableMoves()]
 
-                """first simulate one game for each available move"""
+                totalsamples = self.samples*len(moves)
+                ## first simulate one game for each available move
                 for move in moves:
-                        nextState = self.__nextState(state, move.number)
+                        nextState = self.__nextState(state, move.index)
                         value = self.__simulate(nextState)
                         move.updateValue(value)
+                        totalsamples-= 1
 
-                repeat = self.samples * (len(moves)-1) 
-                """next simulate for uniformly choosen moves"""
-                for i in range(repeat):
+                ## next simulate for uniformly choosen moves
+                while totalsamples:
                         move = choice(moves)
-                        nextState = self.__nextState(state, move.number)
+                        nextState = self.__nextState(state, move.index)
                         value = self.__simulate(nextState)
                         move.updateValue(value)
+                        totalsamples-= 1
 
                 return self.__bestMove(moves)
                         
@@ -109,14 +110,19 @@ class Uniform(Agent):
                                 state.blackMove(move)
                 return self.game.scoreBonus(state)
 
-        def __bestMove(self, moves):
-                """receive list of Move objects and return the number of the move with the best average value"""
-                values = [move.getAvgValue() for move in moves]
-                index = values.index(max(values))
-                return moves[index].number
+        @staticmethod
+        def __bestMove(moves):
+                """receive list of Move objects and return the index of the move
+                with the best average value"""
+                return reduce(lambda a, b: a.getAvgValue()>b.getAvgValue and a or b, moves).index
+
+def test_bestMove():
+       assert 1==Uniform._Uniform__bestMove([Move(0, 3, 3), Move(1, 2, 1)])
 
 def test():
-        __testMove()
+        test_Move()
+        test_bestMove()
+
 
 test()
         
