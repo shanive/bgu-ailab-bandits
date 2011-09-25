@@ -118,7 +118,7 @@ def runTournament(conf):
     
     samples = conf.min_samples_per_action
     while samples <= conf.max_samples_per_action:
-        results = simulation(conf, round(samples))
+        results = simulation(conf, int(round(samples)))
 
         ##print next line of results
         print "%-10d" % samples,

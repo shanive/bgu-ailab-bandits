@@ -62,11 +62,19 @@ def test_MoveStat():
 class Stats(dict):
         "dictionary for node statistics"
         def __getitem__(self, state):
-                "like __getitem__, but if does not exist, initialize to empty statistics"
+                "like a[b], but if b not in a, initialize to empty statistics"
                 stateid = state.id()
                 if stateid not in self:
                         self[stateid] = dict((move, MoveStat()) for move in state.availableMoves())
                 return dict.__getitem__(self, stateid)
+
+def select_all_then_this(state, stats, select_this):
+        """select an unvisited action if any,
+        then according to select_this"""
+        for move, stat in stats[state].items():
+                if not stat.count:
+                        return move
+        return select_this(state, stats)
 
 class MCTS(Agent):
         """uniform MCTS player"""
@@ -74,37 +82,34 @@ class MCTS(Agent):
         def __init__(self, game, samples, select_first, select_next=None):
                 Agent.__init__(self, game)
                 self.samples = samples
-                def select_all_then_this(state, select_this):
-                        for move, stat in self.stats[state].items():
-                                if not stat.count:
-                                        return move
-                        return select_this(state)
-                self.select_first = lambda state: select_all_then_this(state, select_first)
-                self.select_next = lambda state: select_all_then_this(state, select_next or select_first)
+                self.select_first = lambda state, stats: \
+                    select_all_then_this(state, stats, select_first)
+                self.select_next = lambda state, stats: \
+                    select_all_then_this(state, stats, select_next or select_first)
 
         def selectMove(self, state):
                 """receive the state of the game and return the next move"""
-                self.stats = Stats()
+                stats = Stats()
                 totalsamples = self.samples*len(state.availableMoves())
-                while totalsamples>0: # beware fractional total number of samples
-                        value = self.__simulate(copy(state), self.select_first)
+                while totalsamples:
+                        value = self.__simulate(self.select_first, copy(state), stats)
                         totalsamples-= 1
-                return self.__bestMove(self.stats[state])
+                return self.__bestMove(stats[state])
 
-        def __simulate(self, state, select):
+        def __simulate(self, select, state, stats):
                 """simulate a game from a given state. return the score bonus"""
 
                 if self.game.isFinalState(state):
                         return self.game.scoreBonus(state)
                 else:
-                        move = select(state)
-                        stat = self.stats[state][move]
+                        move = select(state, stats)
+                        stat = stats[state][move]
                         isWhite = state.isWhiteTurn()
                         if isWhite:
                                 state.whiteMove(move)
                         else:
                                 state.blackMove(move)
-                        bonus = self.__simulate(state, self.select_next)
+                        bonus = self.__simulate(self.select_next, state, stats)
                         if isWhite:
                                 stat.updateValue(bonus) # white, max
                         else:
@@ -121,7 +126,8 @@ class MCTS(Agent):
 class Uniform(MCTS):
         "Uniform Monte Carlo sampling"
         def __init__(self, game, samples):
-                MCTS.__init__(self, game, samples, lambda state: choice(state.availableMoves()))
+                MCTS.__init__(self, game, samples,
+                              lambda state, stats: choice(state.availableMoves()))
 
 def test_bestMove():
        assert 1==MCTS._MCTS__bestMove(dict([(0, MoveStat(3, 3)), (1, MoveStat(2, 1))]))
