@@ -7,7 +7,7 @@ from copy import copy
 class Random(Agent):
 	"""random algorithm for playing sos game."""
 	
-	def __init__(self, game):
+	def __init__(self, game, samples):
 		Agent.__init__(self, game)
 		
 	def selectMove(self, state):
@@ -17,7 +17,7 @@ class Random(Agent):
 class Left(Agent):
 	"""algorithm for playing sos game. always choose the leftmost available move"""
 	
-	def __init__(self, game):
+	def __init__(self, game, samples):
 		Agent.__init__(self, game)
 		
 	def selectMove(self, state):
@@ -27,7 +27,7 @@ class Left(Agent):
 class Right(Agent):
 	"""algorithm for playing sos game. always choose the rightmost available move"""
 	
-	def __init__(self, game):
+	def __init__(self, game, samples):
 		Agent.__init__(self, game)
 		
 	def selectMove(self, state):

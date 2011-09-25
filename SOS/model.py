@@ -138,7 +138,11 @@ class Agent:
                 """select move based on the state of the game"""
                 assert False, "selectMove not implemented for %s" % \
                     self.__class__
-        
+	
+	@classmethod
+	def name(self):
+		return self.__name__
+
 def test_game():
         game = Game(4, [3, 2, 0, 1])
         state = State(4)
@@ -149,6 +153,15 @@ def test_game():
         assert game.scoreBonus(state) == -2
          
         
+def test_turn():
+	state = State(4)
+	assert state.isWhiteTurn()
+	state.whiteMove(3)
+	assert not state.isWhiteTurn()
+	state.blackMove(2)
+	assert state.isWhiteTurn()	
+	
+	
 def test_availableMoves():
         state = State(4)
         assert state.availableMoves()==[0, 1, 2, 3]
@@ -210,6 +223,7 @@ def test_state():
         test_whites_blacks()
         test_state_id()
         test_state_copy()
+	test_turn()
         
 def test():
         test_state()

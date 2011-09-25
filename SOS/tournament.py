@@ -6,118 +6,141 @@ import getopt
 import agents
 from random import choice
 
-def listToPairs(lst):
-    """receive list of elements and return a list of pairs of the elements"""
-    pairs = []
-    for i in range(len(lst)):
-        for j in range(len(lst)):
-            if not i == j:
-                pairs.append((lst[i],lst[j]))
-    return pairs
+
+class Conf:
+	RANDOM = 0
+	ASCENDING = 1
+	DESCENDING = 2
+	def __init__(self):
+		self.number_of_switches = 10
+		self.min_samples_per_action = 10
+		self.max_samples_per_action = 1000
+		self.sample_step = 2
+		self.switch_order = Conf.RANDOM
+		self.repetitions = 1000
+		self.agents = [agents.Random, agents.Random]
+		
+	def __str__(self):
+		agents = ""
+		for agent in self.agents:
+			agents += agent.name() +" "
+		return "number of switches: %d\n" % self.number_of_switches + \
+			"min samples per action: %d\n" % self.min_samples_per_action +\
+			"max samples per action: %d\n" % self.max_samples_per_action  +\
+			"semple step: %d\n" % self.sample_step +\
+			"switches order %d\n" % self.switch_order +\
+			"repetitions: %d\n" % self.repetitions +\
+			"agents: %s" % agents
+
+#def listToPairs(lst):
+    #"""receive list of elements and return a list of pairs of the elements"""
+    #pairs = []
+    #for i in range(len(lst)):
+        #for j in range(len(lst)):
+            #if not i == j:
+                #pairs.append((lst[i],lst[j]))
+    #return pairs
     
+def nameToAgent(name):
+	"""receive agent's name and return referrence to the corresponding agent's class"""
+	return getattr(agents, name)
 
 
 def usage():
     """print usage message to standart output"""
-    print "Usage: python tournament.py --min min-n --max max-n --step step-n --repeat reapetions --order r/a/d --samples sample-num player-name [player-name]..."
+    print "Usage: python tournament.py --size switches --min min-samples --max max-samples --step sample-step --repeat reapetions --order r/a/d player-name [player-name]..."
     
-def inputParser(argList):
+def parseCommandLine(argList):
     """receive input for SOS Game experiment"""
     ### default values:
-    minN = 10
-    maxN = 10
-    step = 2
-    repetitions = 100000
-    order = 'r'  #'r' = random, 'a' = ascending, 'd' = descending)  
-    #white = 'random'
-    #black = 'random'
-    samples = 100   ##### for MCST algorithm
+    conf = Conf()
     
     try:
-        opts, args = getopt.getopt(argList,"",["min=","max=","step=", "repeat=", "order=", "samples="])
+        opts, args = getopt.getopt(argList,"",["min=","max=","step=", "repeat=", "order=", "size="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
     
     for opt,arg in opts:
-        if opt == '--min':
-            minN = int(arg)
+	if opt == '--size':
+		conf.number_of_switches = int(arg)
+        elif opt == '--min':
+            conf.min_samples_per_action = int(arg)
         elif opt == '--max':
-            maxN = int(arg)
+            conf.max_samples_per_action = int(arg)
         elif opt == '--step':
-            step = float(arg)
+            conf.sample_step = float(arg)
         elif opt == '--repeat':
-            repetitions = int(arg)
-        elif opt == '--order' and arg in ('r','a','d'):
-            order = arg
-        elif opt == '--samples':
-            samples = arg           
+            conf.repetitions = int(arg)
+        elif opt == '--order' and int(arg) in (conf.RANDOM, conf.ASCENDING, conf.DESCENDING):
+            conf.switch_order = int(arg)
         else:
             print "Unvalid Option\n"
             usage()
-            sys.exit(2)  
-            
-    tournament(minN, maxN, step, repetitions, order, samples, args)
+            sys.exit(2)
+	    
+    if args:
+	    conf.agents = [nameToAgent(name) for name in args]
+	                
+    return conf
 
-def twoPlayersGame(game, repetitions, pair, samples):
+def twoPlayersGame(game, samples, firstplayer, secondPlayer, conf):
     """simulate a game between to given players. return the average difference"""
     avgDiff = 0.0
-    
-    first = getattr(agents, pair[0])
-    second = getattr(agents, pair[1])
-
-    if pair[0] == 'Uniform':
-            firstPlayer = first(game, samples)
-    else:
-            firstPlayer = first(game)
-
-    if pair[1] == 'Uniform':
-            secondPlayer = second(game, samples)
-    else:
-            secondPlayer = second(game)
     
     for reapet in range(repetitions):
         avgDiff += game.play(firstPlayer, secondPlayer)
         
     return avgDiff / repetitions
+   
     
-def simulateGame(n, valuesOrder, repeat, players, database, samples):
-    """receive game details and simulate a game. update results in database"""
-    game = model.Game(n, order = valuesOrder) ##########values-?
-            
-    for i in range(len(players)):
-        avgDiff = twoPlayersGame(game, repeat, players[i], samples)         
-        database[i+1].append(avgDiff)
-        print "%f\t" % avgDiff,
-            
-    print
+def simulation(conf, game, samples, players, dict):
+	"""receive samples num and simulate a tournament. update results in dict"""
+	    
+	for playerA in players):
+		for playerB in players):
+			if not playerA == playerB: 
+				avgDiff = twoPlayersGame(game, samples, playerA, playerB, conf)
+				"""update results"""
+				dict[playerA.name()] += avgDiff
+				dict[playerB.name()] += avgDiff * -1   #############ask
         
-def tournament(minN, maxN, step, repeat, valorder, samples, players):
-    """excecute the tournament and print results"""
-    pairs = listToPairs(players)
-    results = [["n"]]
-    
-    """print first row"""
-    print "n\t",
-    for player1, player2 in pairs:  
-        results.append([(player1,player2)])
-        print "%s-%s\t" % (player1, player2),
+def tournament(conf):
+    """excecute the tournament and print results. """
+ 
+    """print first line of results"""
+     #"""print first row"""
+    print "samples\t",
+    for agent in conf.agents:  
+        print agent.name() + '\t',
     print   
-    n = minN
-    while n <= maxN:
-        results[0].append(n)
-        print "%d\t" % n,
-        simulateGame(n, valorder, repeat, pairs, results, samples)
-        print
-        n = n * step
-        if round(n) > n:
-            n = int(round(n) - 1)
-        else:
-            n = int(round(n))   
+    
+    game  = model.Game(conf.number_of_switches, order  = conf.switch_order)
+    players = [agent(game) for agent in conf.agents]
+    results = dict((a.name(), 0.0) for a in conf.agents)
+    
+    samples = conf.min_samples_per_action
+    while samples <= conf.max_samples_per_action:
+        
+        print "%d\t" % samples,
+        simulation(conf, game, samples, players, dict)
+        """print next line of results"""
+	for agent in conf.agents:
+		print dict[agent.name()] + '\t'
+	print
+	
+        samples *= step
+        #if round(n) > n:
+            #n = int(round(n) - 1)
+        #else:
+            #n = int(round(n))   
         
         
 if __name__ == '__main__':
-        inputParser("--min 10 --max 1000 --order a --repeat 100 Random Left Uniform".split())
-    #inputParser(sys.argv[1:])
-    
+	conf = parseCommandLine(sys.argv[1:])
+	
+	print >> sys.stderr, conf 
+	
+	# runTournament(conf)
+	
     
