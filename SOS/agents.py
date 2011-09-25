@@ -58,12 +58,14 @@ def test_MoveStat():
         move.updateValue(0.3)
         assert move.getAvgValue() == 0.4
 
-class Uniform(Agent):
+class MCTS(Agent):
         """uniform MCTS player"""
 
-        def __init__(self, game, samples):
+        def __init__(self, game, samples, select_first, select_next):
                 Agent.__init__(self, game)
                 self.samples = samples
+                self.select_first = select_first
+                self.select_next = select_next
 
         def selectMove(self, state):
                 """receive the state of the game and return the next move"""
@@ -80,7 +82,8 @@ class Uniform(Agent):
 
                 ## next simulate for uniformly choosen moves
                 while totalsamples:
-                        move, stat = choice(movestats.items())
+                        move = self.select_first(state)
+                        stat = movestats[move]
                         nextState = self.__nextState(state, move)
                         value = self.__simulate(nextState)
                         stat.updateValue(value)
@@ -103,7 +106,7 @@ class Uniform(Agent):
                 """simulate a game from a given state. return the score bonus"""
                 
                 while not self.game.isFinalState(state):
-                        move = choice(state.availableMoves())
+                        move = self.select_next(state)
                         if state.isWhiteTurn():
                                 state.whiteMove(move)
                         else:
@@ -117,8 +120,14 @@ class Uniform(Agent):
                 return reduce(lambda a, b: a[1].getAvgValue()>b[1].getAvgValue() and a or b,
                               movestats.items())[0]
 
+class Uniform(MCTS):
+        def __init__(self, game, samples):
+                def select_uniform(state):
+                        return choice(state.availableMoves())
+                MCTS.__init__(self, game, samples, select_uniform, select_uniform)
+
 def test_bestMove():
-       assert 1==Uniform._Uniform__bestMove(dict([(0, MoveStat(3, 3)), (1, MoveStat(2, 1))]))
+       assert 1==MCTS._MCTS__bestMove(dict([(0, MoveStat(3, 3)), (1, MoveStat(2, 1))]))
 
 def test():
         test_MoveStat()
