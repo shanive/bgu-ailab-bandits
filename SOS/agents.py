@@ -1,5 +1,6 @@
 """this module contain agents for sos game"""
 
+import sys
 from random import choice
 from model import *
 from copy import copy
@@ -58,62 +59,57 @@ def test_MoveStat():
         move.updateValue(0.3)
         assert move.getAvgValue() == 0.4
 
+class Stats(dict):
+        "dictionary for node statistics"
+        def __getitem__(self, state):
+                "like __getitem__, but if does not exist, initialize to empty statistics"
+                stateid = state.id()
+                if stateid not in self:
+                        self[stateid] = dict((move, MoveStat()) for move in state.availableMoves())
+                return dict.__getitem__(self, stateid)
+
 class MCTS(Agent):
         """uniform MCTS player"""
 
-        def __init__(self, game, samples, select_first, select_next):
+        def __init__(self, game, samples, select_first, select_next=None):
                 Agent.__init__(self, game)
                 self.samples = samples
-                self.select_first = select_first
-                self.select_next = select_next
+                def select_all_then_first(state):
+                        for move, stat in self.stats[state].items():
+                                if not stat.count:
+                                        return move
+                        return select_first(state)
+                self.select_first = select_all_then_first
+                self.select_next = select_next or select_first
 
         def selectMove(self, state):
                 """receive the state of the game and return the next move"""
-                moves = state.availableMoves()
-                totalsamples = self.samples*len(moves)
-                movestats = dict((move, MoveStat()) for move in moves)
-
-                ## first simulate one game for each available move
-                for move, stat in movestats.items():
-                        nextState = self.__nextState(state, move)
-                        value = self.__simulate(nextState, self.select_next)
-                        stat.updateValue(value)
-                        totalsamples-= 1
-
-                ## next simulate for uniformly choosen moves
+                self.stats = Stats()
+                totalsamples = self.samples*len(state.availableMoves())
                 while totalsamples:
-                        move = self.select_first(state)
-                        stat = movestats[move]
-                        nextState = self.__nextState(state, move)
-                        value = self.__simulate(nextState, self.select_next)
-                        stat.updateValue(value)
+                        value = self.__simulate(copy(state), self.select_first)
                         totalsamples-= 1
-
-                return self.__bestMove(movestats)
+                return self.__bestMove(self.stats[state])
                         
-        def __nextState(self, state, move):
-                """receive a state and first move and return the next state.
-                state not changed"""
-                newState = copy(state)
-                if newState.isWhiteTurn():
-                        newState.whiteMove(move)
-                else:
-                        newState.blackMove(move)
-                return newState
 
         def __simulate(self, state, select):
                 """simulate a game from a given state. return the score bonus"""
-                
+
                 if self.game.isFinalState(state):
                         return self.game.scoreBonus(state)
                 else:
-                        move = self.select_next(state)
-                        if state.isWhiteTurn():
+                        move = select(state)
+                        stat = self.stats[state][move]
+                        isWhite = state.isWhiteTurn()
+                        if isWhite:
                                 state.whiteMove(move)
                         else:
                                 state.blackMove(move)
-                        bonus = self.__simulate(state, select)
-                        # update stats for move
+                        bonus = self.__simulate(state, self.select_next)
+                        if isWhite:
+                                stat.updateValue(bonus) # white, max
+                        else:
+                                stat.updateValue(-bonus) # black, min
                         return bonus
 
         @staticmethod
@@ -124,10 +120,9 @@ class MCTS(Agent):
                               movestats.items())[0]
 
 class Uniform(MCTS):
+        "Uniform Monte Carlo sampling"
         def __init__(self, game, samples):
-                def select_uniform(state):
-                        return choice(state.availableMoves())
-                MCTS.__init__(self, game, samples, select_uniform, select_uniform)
+                MCTS.__init__(self, game, samples, lambda state: choice(state.availableMoves()))
 
 def test_bestMove():
        assert 1==MCTS._MCTS__bestMove(dict([(0, MoveStat(3, 3)), (1, MoveStat(2, 1))]))
@@ -135,7 +130,6 @@ def test_bestMove():
 def test():
         test_MoveStat()
         test_bestMove()
-
 
 test()
         
