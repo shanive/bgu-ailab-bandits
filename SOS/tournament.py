@@ -109,16 +109,14 @@ def runTournament(conf):
     print   
     
     game  = model.Game(conf.number_of_switches, order  = conf.switch_order)
-    results = dict((a.name(), 0.0) for a in conf.agents)
-    
     samples = conf.min_samples_per_action
     while samples <= conf.max_samples_per_action:
-        
         print "%-10d" % samples,
+        results = dict((a.name(), 0.0) for a in conf.agents)
         simulation(conf, game, samples, results)
         ##print next line of results
 	for agent in conf.agents:
-		print "%-10f" % (results[agent.name()] / samples),
+		print "%-10f" % (results[agent.name()]),
 	print
 	
         samples *= conf.sample_step  

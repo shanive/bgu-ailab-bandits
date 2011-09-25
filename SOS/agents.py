@@ -36,11 +36,10 @@ class Right(Agent):
 		return moves[len(moves) - 1]
 
 
-class Move:
-        "A move in a simulated sos game"
-        def __init__(self, index, valuesum=0.0, count=0):
-                """receive the move's index and initialize a new move"""
-                self.index = index
+class MoveStat:
+        """Move statistics"""
+        def __init__(self, valuesum=0.0, count=0):
+                """initialize move statistics to unsampled state"""
                 self.valuesum = valuesum
                 self.count = count
 
@@ -53,8 +52,8 @@ class Move:
                 """return the average value of this move"""
                 return self.valuesum / self.count
 
-def test_Move():
-        move = Move(3)
+def test_MoveStat():
+        move = MoveStat()
         move.updateValue(0.5)
         move.updateValue(0.3)
         assert move.getAvgValue() == 0.4
@@ -68,25 +67,26 @@ class Uniform(Agent):
 
         def selectMove(self, state):
                 """receive the state of the game and return the next move"""
-                moves = [Move(index) for index in state.availableMoves()]
-
+                moves = state.availableMoves()
                 totalsamples = self.samples*len(moves)
+                movestats = dict((move, MoveStat()) for move in moves)
+
                 ## first simulate one game for each available move
-                for move in moves:
-                        nextState = self.__nextState(state, move.index)
+                for move, stat in movestats.items():
+                        nextState = self.__nextState(state, move)
                         value = self.__simulate(nextState)
-                        move.updateValue(value)
+                        stat.updateValue(value)
                         totalsamples-= 1
 
                 ## next simulate for uniformly choosen moves
                 while totalsamples:
-                        move = choice(moves)
-                        nextState = self.__nextState(state, move.index)
+                        move, stat = choice(movestats.items())
+                        nextState = self.__nextState(state, move)
                         value = self.__simulate(nextState)
-                        move.updateValue(value)
+                        stat.updateValue(value)
                         totalsamples-= 1
 
-                return self.__bestMove(moves)
+                return self.__bestMove(movestats)
                         
         def __nextState(self, state, move):
                 """receive a state and first move and return the next state.
@@ -111,17 +111,17 @@ class Uniform(Agent):
                 return self.game.scoreBonus(state)
 
         @staticmethod
-        def __bestMove(moves):
+        def __bestMove(movestats):
                 """receive list of Move objects and return the index of the move
                 with the best average value"""
-                return reduce(lambda a, b: a.getAvgValue()>b.getAvgValue() and a or b,
-                              moves).index
+                return reduce(lambda a, b: a[1].getAvgValue()>b[1].getAvgValue() and a or b,
+                              movestats.items())[0]
 
 def test_bestMove():
-       assert 1==Uniform._Uniform__bestMove([Move(0, 3, 3), Move(1, 2, 1)])
+       assert 1==Uniform._Uniform__bestMove(dict([(0, MoveStat(3, 3)), (1, MoveStat(2, 1))]))
 
 def test():
-        test_Move()
+        test_MoveStat()
         test_bestMove()
 
 
