@@ -76,7 +76,7 @@ class MCTS(Agent):
                 ## first simulate one game for each available move
                 for move, stat in movestats.items():
                         nextState = self.__nextState(state, move)
-                        value = self.__simulate(nextState)
+                        value = self.__simulate(nextState, self.select_next)
                         stat.updateValue(value)
                         totalsamples-= 1
 
@@ -85,7 +85,7 @@ class MCTS(Agent):
                         move = self.select_first(state)
                         stat = movestats[move]
                         nextState = self.__nextState(state, move)
-                        value = self.__simulate(nextState)
+                        value = self.__simulate(nextState, self.select_next)
                         stat.updateValue(value)
                         totalsamples-= 1
 
@@ -93,7 +93,6 @@ class MCTS(Agent):
                         
         def __nextState(self, state, move):
                 """receive a state and first move and return the next state.
-
                 state not changed"""
                 newState = copy(state)
                 if newState.isWhiteTurn():
@@ -102,16 +101,20 @@ class MCTS(Agent):
                         newState.blackMove(move)
                 return newState
 
-        def __simulate(self, state):
+        def __simulate(self, state, select):
                 """simulate a game from a given state. return the score bonus"""
                 
-                while not self.game.isFinalState(state):
+                if self.game.isFinalState(state):
+                        return self.game.scoreBonus(state)
+                else:
                         move = self.select_next(state)
                         if state.isWhiteTurn():
                                 state.whiteMove(move)
                         else:
                                 state.blackMove(move)
-                return self.game.scoreBonus(state)
+                        bonus = self.__simulate(state, select)
+                        # update stats for move
+                        return bonus
 
         @staticmethod
         def __bestMove(movestats):
