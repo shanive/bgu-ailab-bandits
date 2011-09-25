@@ -79,46 +79,52 @@ def parseCommandLine(argList):
     return conf
 
 def twoPlayersGame(game, firstPlayer, secondPlayer, repetitions):
-    """simulate a game between to given players. return the average difference"""
+    """simulate a game between two given players. return the average difference"""
     avgDiff = 0.0
     
-    for reapet in range(repetitions):
-        avgDiff += game.play(firstPlayer, secondPlayer)
+    for repeat in range(repetitions):
+        avgDiff+= game.play(firstPlayer, secondPlayer)
         
     return avgDiff / repetitions
    
     
-def simulation(conf, game, samples, results):
-	"""simulate a tournament for a givem game and given number of samples. update results"""
-	players = [agent(game, samples) for agent in conf.agents]    
-	for playerA in players:
-		for playerB in players:
-			if not playerA == playerB: 
-				avgDiff = twoPlayersGame(game, playerA, playerB, conf.repetitions)
-				##update results
-				results[playerA.name()] += avgDiff
-				results[playerB.name()] += avgDiff * -1   #############ask
+def simulation(conf, samples):
+	"""simulate a tournament for the given number of samples.
+        return results"""
+        results = [0.0 for a in conf.agents]
+	for i in range(len(conf.agents)):
+		for j in range(len(conf.agents)):
+			if i!=j:
+                                ai = conf.agents[i]
+                                aj = conf.agents[j]
+                                game  = model.Game(conf.number_of_switches,
+                                                   order  = conf.switch_order)
+				avgDiff = twoPlayersGame(game,
+                                                         ai(game, samples),
+                                                         aj(game, samples),
+                                                         conf.repetitions)
+				## update results
+				results[i]+= avgDiff
+				results[j]-= avgDiff
+        return results
         
 def runTournament(conf):
     """excecute the tournament and print results. """
  
-    ##print first line of results
+    ##print the header
     print "%-10s" % "samples",
-    for agent in conf.agents:  
-        print "%-10s" % agent.name(),
+    for agent in conf.agents: print "%-10s" % agent.name(),
     print   
     
-    game  = model.Game(conf.number_of_switches, order  = conf.switch_order)
     samples = conf.min_samples_per_action
     while samples <= conf.max_samples_per_action:
-        print "%-10d" % samples,
-        results = dict((a.name(), 0.0) for a in conf.agents)
-        simulation(conf, game, samples, results)
+        results = simulation(conf, samples)
+
         ##print next line of results
-	for agent in conf.agents:
-		print "%-10f" % (results[agent.name()]),
+        print "%-10d" % samples,
+	for result in results: print "%-10f" % result,
 	print
-	
+
         samples *= conf.sample_step  
         
         
