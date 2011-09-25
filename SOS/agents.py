@@ -74,13 +74,13 @@ class MCTS(Agent):
         def __init__(self, game, samples, select_first, select_next=None):
                 Agent.__init__(self, game)
                 self.samples = samples
-                def select_all_then_first(state):
+                def select_all_then_this(state, select_this):
                         for move, stat in self.stats[state].items():
                                 if not stat.count:
                                         return move
-                        return select_first(state)
-                self.select_first = select_all_then_first
-                self.select_next = select_next or select_first
+                        return select_this(state)
+                self.select_first = lambda state: select_all_then_this(state, select_first)
+                self.select_next = lambda state: select_all_then_this(state, select_next or select_first)
 
         def selectMove(self, state):
                 """receive the state of the game and return the next move"""
@@ -90,7 +90,6 @@ class MCTS(Agent):
                         value = self.__simulate(copy(state), self.select_first)
                         totalsamples-= 1
                 return self.__bestMove(self.stats[state])
-                        
 
         def __simulate(self, state, select):
                 """simulate a game from a given state. return the score bonus"""
