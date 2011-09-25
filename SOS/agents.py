@@ -114,7 +114,8 @@ class Uniform(Agent):
         def __bestMove(moves):
                 """receive list of Move objects and return the index of the move
                 with the best average value"""
-                return reduce(lambda a, b: a.getAvgValue()>b.getAvgValue() and a or b, moves).index
+                return reduce(lambda a, b: a.getAvgValue()>b.getAvgValue() and a or b,
+                              moves).index
 
 def test_bestMove():
        assert 1==Uniform._Uniform__bestMove([Move(0, 3, 3), Move(1, 2, 1)])
