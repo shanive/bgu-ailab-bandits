@@ -146,7 +146,7 @@ def selectGreedy(state, stats):
 ## UCB
 
 def selectUCB(state, stats):
-        Cp = state.size**2 # approximate upper bound
+        Cp = 0.5*state.size*len(state.availableMoves()) # approximate upper bound
         totalcount = sum(stat.count for stat in stats[state].values())
         A = 2.0*Cp*sqrt(log(totalcount))
         def ucb(stat):
