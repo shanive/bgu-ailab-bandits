@@ -86,7 +86,7 @@ class MCTS(Agent):
                 """receive the state of the game and return the next move"""
                 self.stats = Stats()
                 totalsamples = self.samples*len(state.availableMoves())
-                while totalsamples:
+                while totalsamples>0: # beware fractional total number of samples
                         value = self.__simulate(copy(state), self.select_first)
                         totalsamples-= 1
                 return self.__bestMove(self.stats[state])
