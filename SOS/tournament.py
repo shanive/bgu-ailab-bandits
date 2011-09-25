@@ -59,9 +59,9 @@ def parseCommandLine(argList):
 	if opt == '--size':
 		conf.number_of_switches = int(arg)
         elif opt == '--min':
-            conf.min_samples_per_action = int(arg)
+            conf.min_samples_per_action = float(arg)
         elif opt == '--max':
-            conf.max_samples_per_action = int(arg)
+            conf.max_samples_per_action = float(arg)
         elif opt == '--step':
             conf.sample_step = float(arg)
         elif opt == '--repeat':
