@@ -8,6 +8,7 @@ from random import choice
 
 
 class Conf:
+	"""configuration of tournament"""
 	RANDOM = 0
 	ASCENDING = 1
 	DESCENDING = 2
@@ -21,6 +22,7 @@ class Conf:
 		self.agents = [agents.Random, agents.Random]
 		
 	def __str__(self):
+		"""return string for print"""
 		agents = ""
 		for agent in self.agents:
 			agents += agent.name() +" "
@@ -30,17 +32,9 @@ class Conf:
 			"semple step: %d\n" % self.sample_step +\
 			"switches order %d\n" % self.switch_order +\
 			"repetitions: %d\n" % self.repetitions +\
-			"agents: %s" % agents
+			"agents: %s\n" % agents
 
-#def listToPairs(lst):
-    #"""receive list of elements and return a list of pairs of the elements"""
-    #pairs = []
-    #for i in range(len(lst)):
-        #for j in range(len(lst)):
-            #if not i == j:
-                #pairs.append((lst[i],lst[j]))
-    #return pairs
-    
+
 def nameToAgent(name):
 	"""receive agent's name and return referrence to the corresponding agent's class"""
 	return getattr(agents, name)
@@ -84,7 +78,7 @@ def parseCommandLine(argList):
 	                
     return conf
 
-def twoPlayersGame(game, samples, firstplayer, secondPlayer, conf):
+def twoPlayersGame(game, firstPlayer, secondPlayer, repetitions):
     """simulate a game between to given players. return the average difference"""
     avgDiff = 0.0
     
@@ -94,46 +88,40 @@ def twoPlayersGame(game, samples, firstplayer, secondPlayer, conf):
     return avgDiff / repetitions
    
     
-def simulation(conf, game, samples, players, dict):
-	"""receive samples num and simulate a tournament. update results in dict"""
-	    
-	for playerA in players):
-		for playerB in players):
+def simulation(conf, game, samples, results):
+	"""simulate a tournament for a givem game and given number of samples. update results"""
+	players = [agent(game, samples) for agent in conf.agents]    
+	for playerA in players:
+		for playerB in players:
 			if not playerA == playerB: 
-				avgDiff = twoPlayersGame(game, samples, playerA, playerB, conf)
-				"""update results"""
-				dict[playerA.name()] += avgDiff
-				dict[playerB.name()] += avgDiff * -1   #############ask
+				avgDiff = twoPlayersGame(game, playerA, playerB, conf.repetitions)
+				##update results
+				results[playerA.name()] += avgDiff
+				results[playerB.name()] += avgDiff * -1   #############ask
         
-def tournament(conf):
+def runTournament(conf):
     """excecute the tournament and print results. """
  
-    """print first line of results"""
-     #"""print first row"""
-    print "samples\t",
+    ##print first line of results
+    print "%-10s" % "samples",
     for agent in conf.agents:  
-        print agent.name() + '\t',
+        print "%-10s" % agent.name(),
     print   
     
     game  = model.Game(conf.number_of_switches, order  = conf.switch_order)
-    players = [agent(game) for agent in conf.agents]
     results = dict((a.name(), 0.0) for a in conf.agents)
     
     samples = conf.min_samples_per_action
     while samples <= conf.max_samples_per_action:
         
-        print "%d\t" % samples,
-        simulation(conf, game, samples, players, dict)
-        """print next line of results"""
+        print "%-10d" % samples,
+        simulation(conf, game, samples, results)
+        ##print next line of results
 	for agent in conf.agents:
-		print dict[agent.name()] + '\t'
+		print "%-10f" % (results[agent.name()] / samples),
 	print
 	
-        samples *= step
-        #if round(n) > n:
-            #n = int(round(n) - 1)
-        #else:
-            #n = int(round(n))   
+        samples *= conf.sample_step  
         
         
 if __name__ == '__main__':
@@ -141,6 +129,6 @@ if __name__ == '__main__':
 	
 	print >> sys.stderr, conf 
 	
-	# runTournament(conf)
+	runTournament(conf)
 	
     

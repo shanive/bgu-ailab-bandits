@@ -92,11 +92,11 @@ class Game:
         def __initValues(self, order):
                 """initiate moves' values according to a given order"""
                 values = range(self.n)
-                if order == 'u':    # U)p
+                if order == 1:    # ascending
                         pass # already in accending order
-                elif order == 'd':  # D)own
+                elif order == 2:  # descending
                         values.reverse()  
-                elif order == 'r':  # R)andom
+                elif order == 0:  # random
                         shuffle(values)
                 return values
         
