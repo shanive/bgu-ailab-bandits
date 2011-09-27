@@ -128,12 +128,17 @@ class MCTS(Agent):
                                 stat.updateValue(-bonus) # black, min
                         return bonus
 
+### uniform random selector
+
+def selectRandom(state, stats):
+	"""select one of available moves randomly,
+	with equal probability"""
+	return choice(state.availableMoves())
 
 class Uniform(MCTS):
         "Uniform Monte Carlo sampling"
         def __init__(self, game, samples):
-                MCTS.__init__(self, game, samples,
-                              lambda state, stats: choice(state.availableMoves()))
+                MCTS.__init__(self, game, samples, selectRandom)
 
 ### adaptive selectors
 
@@ -176,6 +181,11 @@ class UCT(MCTS):
 class GCT(MCTS):
         def __init__(self, game, samples, score_bonus = 0):
                 MCTS.__init__(self, game, samples, selectGreedy, selectUCB)
+
+class GRT(MCTS):
+        def __init__(self, game, samples, score_bonus = 0):
+                MCTS.__init__(self, game, samples, selectGreedy, selectRandom)
+
 
 ### Tests
 
