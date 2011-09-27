@@ -17,7 +17,7 @@ class Conf:
 		self.number_of_switches = 10
 		self.min_samples_per_action = 10
 		self.max_samples_per_action = 1000
-		self.sample_step = 2
+		self.sample_step = 2.0
 		self.switch_order = Conf.RANDOM
 		self.repetitions = 1000
 		self.agents = [agents.Random, agents.Random]
