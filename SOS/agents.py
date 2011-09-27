@@ -17,7 +17,8 @@ class Random(Agent):
 		return choice(state.availableMoves())
  
 class Left(Agent):
-	"""algorithm for playing sos game. always choose the leftmost available move"""
+	"""algorithm for playing sos game. 
+	always choose the leftmost available move"""
 	
 	def __init__(self, game, samples):
 		Agent.__init__(self, game)
@@ -66,7 +67,8 @@ class Stats(dict):
                 "like a[b], but if b not in a, initialize to empty statistics"
                 stateid = state.id()
                 if stateid not in self:
-                        self[stateid] = dict((move, MoveStat()) for move in state.availableMoves())
+                        self[stateid] = dict((move, MoveStat()) \
+				           for move in state.availableMoves())
                 return dict.__getitem__(self, stateid)
 
 def selectAllThenThis(state, stats, selectThis):
