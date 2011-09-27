@@ -6,6 +6,8 @@ from math import log, sqrt
 from model import *
 from copy import copy
 
+computeCp = None
+
 class Random(Agent):
 	"""random algorithm for playing sos game."""
 	
@@ -109,7 +111,8 @@ class MCTS(Agent):
                 """simulate a game from a given state. return the score bonus"""
 
                 if self.game.isFinalState(state):
-                        return self.game.scoreBonus(state)
+			return self.game.calcScore(state)
+                        #return self.game.scoreBonus(state)
                 else:
                         move = select(state, stats)
                         stat = stats[state][move]
@@ -147,8 +150,18 @@ def selectGreedy(state, stats):
 
 ## UCB
 
+def computeCpScoreBonus(state):
+	"""compute Cp if using score bonus"""
+	return 0.5*state.size*len(state.availableMoves())
+ 
+def computeCpWinLoss(state):
+	"""compute Cp without score bonus"""
+	return 1.0
+
 def selectUCB(state, stats):
-        Cp = 0.5*state.size*len(state.availableMoves()) # approximate upper bound
+	# 1, -1 => Cp = 1
+	# 1, 0  => Cp = 0.5
+        Cp = computeCp(state) # approximate upper bound
         totalcount = sum(stat.count for stat in stats[state].values())
         A = 2.0*Cp*sqrt(log(totalcount))
         def ucb(stat):
@@ -157,11 +170,11 @@ def selectUCB(state, stats):
                       stats[state].items())[0]
 
 class UCT(MCTS):
-        def __init__(self, game, samples):
+        def __init__(self, game, samples, score_bonus = 0):
                 MCTS.__init__(self, game, samples, selectUCB)
 
 class GCT(MCTS):
-        def __init__(self, game, samples):
+        def __init__(self, game, samples, score_bonus = 0):
                 MCTS.__init__(self, game, samples, selectGreedy, selectUCB)
 
 ### Tests

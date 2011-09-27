@@ -7,6 +7,7 @@ import agents
 from random import choice
 
 
+
 class Conf:
 	"""configuration of tournament"""
 	RANDOM = 0
@@ -20,6 +21,7 @@ class Conf:
 		self.switch_order = Conf.RANDOM
 		self.repetitions = 1000
 		self.agents = [agents.Random, agents.Random]
+		self.score_bonus = None
 		
 	def __str__(self):
 		"""return string for print"""
@@ -29,10 +31,11 @@ class Conf:
 		return "number of switches: %d\n" % self.number_of_switches + \
 			"min samples per action: %d\n" % self.min_samples_per_action +\
 			"max samples per action: %d\n" % self.max_samples_per_action  +\
-			"semple step: %d\n" % self.sample_step +\
+			"sample step: %d\n" % self.sample_step +\
 			"switches order %d\n" % self.switch_order +\
 			"repetitions: %d\n" % self.repetitions +\
-			"agents: %s\n" % agents
+			"agents: %s\n" % agents +\
+			"score bonus: %d\n" % self.score_bonus
 
 
 def nameToAgent(name):
@@ -42,7 +45,7 @@ def nameToAgent(name):
 
 def usage():
     """print usage message to standart output"""
-    print "Usage: python tournament.py --size switches --min min-samples --max max-samples --step sample-step --repeat reapetions --order r/a/d player-name [player-name]..."
+    print "Usage: python tournament.py --size switches --min min-samples --max max-samples --step sample-step --repeat reapetions --order 0/1/2 scorebonus/winloss player-name [player-name]..."
     
 def parseCommandLine(argList):
     """receive input for SOS Game experiment"""
@@ -50,7 +53,8 @@ def parseCommandLine(argList):
     conf = Conf()
     
     try:
-        opts, args = getopt.getopt(argList,"",["min=","max=","step=", "repeat=", "order=", "size="])
+        opts, args = getopt.getopt(argList,"",["min=","max=","step=", "repeat=", "order=",\
+						"size="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -72,6 +76,17 @@ def parseCommandLine(argList):
             print "Unvalid Option\n"
             usage()
             sys.exit(2)
+    if args[0] == 'scorebonus':
+	    conf.score_bonus = 1
+	    agents.computeCp = agents.computeCpScoreBonus
+    elif args[0] == 'winloss':
+	    conf.score_bonus = 0
+	    agents.computeCp = agents.computeCpWinLoss
+    else:
+        usage()
+        sys.exit(2)
+       
+    args.pop(0)
 	    
     if args:
 	    conf.agents = [nameToAgent(name) for name in args]
@@ -97,8 +112,7 @@ def simulation(conf, samples):
 			if i!=j:
                                 ai = conf.agents[i]
                                 aj = conf.agents[j]
-                                game  = model.Game(conf.number_of_switches,
-                                                   order  = conf.switch_order)
+                                game  = model.Game(conf.number_of_switches, order  = conf.switch_order, scorebonus = conf.score_bonus)
 				avgDiff = twoPlayersGame(game,
                                                          ai(game, samples),
                                                          aj(game, samples),

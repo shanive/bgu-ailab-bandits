@@ -80,14 +80,16 @@ class Game:
         scoreBonus(state) -- receive a sos game state and return the score bonus of the game.
         """
         
-        def __init__(self, n, values = None, order = 'r'):
+        def __init__(self, n, values = None, order = 'r', scorebonus = 0):
                 """initiate sos game of a given size.
                 
                 receive:
                 n -- game size
                 values -- values of moves (optional)
-                order -- order of moves' values"""
+                order -- order of moves' values
+		score_bonus -- how to compute the players' scores"""
                 self.n = n
+		self.score_bonus = scorebonus
                 self.values = values or self.__initValues(order)
                 
         def __initValues(self, order):
@@ -116,8 +118,8 @@ class Game:
                         state.whiteMove(move)
                         move = secondPlayer.selectMove(state)
                         state.blackMove(move)
-                        
-                return self.scoreBonus(state)
+                return self.calcScore(state)        
+                #return self.scoreBonus(state) 
                 
         def __score(self, indices):
                 """return total score of switches at the indices"""
@@ -126,7 +128,20 @@ class Game:
         def scoreBonus(self, state):
                 """compute game score bonus"""
                 return self.__score(state.whites()) - self.__score(state.blacks())
-        
+	
+        def winloss(self, state):
+		"""return 1 if first player won and -1 otherwise"""
+		if self.scoreBonus(state) >= self.n/2:
+			return 1
+		else: 
+			return -1
+	
+	def calcScore(self, state):
+		"""return the first player's score.
+		The second player score is it's negation"""
+		return self.score_bonus * self.scoreBonus(state) or\
+				(1 - self.score_bonus) * self.winloss(state)
+		
 
 
 class Agent:
@@ -151,7 +166,7 @@ def test_game():
         state.blackMove(0)
         state.whiteMove(1)
         state.blackMove(3)
-        assert game.scoreBonus(state) == -2
+        assert game.calcScore(state) == -1
          
         
 def test_turn():
