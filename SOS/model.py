@@ -104,6 +104,8 @@ class Stats(dict):
 				           for move in state.availableMoves())
                 return dict.__getitem__(self, stateid)
 
+sampleStat=[]				   
+				   
 class Game:
         
         """Simulate an sos game.
@@ -148,22 +150,22 @@ class Game:
                 state = self.__initialState()
                 while not self.isFinalState(state):
                         move, stats = firstPlayer.selectMove(state)
-			self.printSamplingStat(state, stats, firstPlayer, move)
+			sampleStat.append((firstPlayer.name(), move, stats[state].items()))
                         state.whiteMove(move)
                         move, stats = secondPlayer.selectMove(state)
-			self.printSamplingStat(state, stats, secondPlayer, move)
-                        
+			sampleStat.append((secondPlayer.name(), move, stats[state].items())) 
 			state.blackMove(move)
                 return self.calcScore(state)        
-                #return self.scoreBonus(state) 
 	
-	def printSamplingStat(self, state, stats, player, bestMove):
+	def printSamplingStat(self):
 		"""receive sampling statistics and choosen move and print statistics"""
-		items = stats[state].items()
-		print "%s: %d" % (player.name(),self.values[bestMove]),
-		for move, move_stat in items:
-			print "%d,%d" % (self.values[move], move_stat.count),
-		print 
+		global sampleStat
+		for player, move, items in sampleStat:
+			print "%s: %d" % (player ,self.values[move]),
+			for switch, switch_stat in items:
+				print "%d,%d" % (self.values[switch], switch_stat.count),
+			print 
+		sampleStat = []
 		
                 
         def __score(self, indices):

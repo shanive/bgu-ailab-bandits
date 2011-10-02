@@ -5,7 +5,6 @@ from random import random, choice
 from math import log, sqrt
 from model import *
 from copy import copy
-from matplotlib import pyplot as plt
 
 computeCp = None
 
@@ -56,14 +55,6 @@ def bestMove(state, stats):
         return reduce(lambda a, b: a[1].getAvgValue()>b[1].getAvgValue() and a or b,
                       stats[state].items())[0]
 		   
-#def moves_histogram(plot_data):
-	#"""given sampling order of available moves and create histogram"""
-	#plt.hist(plot_data)
-	#plt.title("Moves Histogram")
-	#plt.xlabel("Available Moves")
-	#plt.ylabel("Sampling")
-	#plt.savefig("movesHistogram.png")
-
 class MCTS(Agent):
         """uniform MCTS player"""
 

@@ -52,6 +52,7 @@ def play(game, repeat, firstPlayer, secondPlayer):
 	diff = 0.0
 	for i in range(repeat):
 		diff += game.play(firstPlayer, secondPlayer)
+		game.printSamplingStat()
 	print "The average difference is: %f" %  (diff / repeat)
 
 
