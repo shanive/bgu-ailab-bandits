@@ -145,24 +145,24 @@ def computeCpWinLoss(state):
 def selectUCB(state, stats):
 	# 1, -1 => Cp = 1
 	# 1, 0  => Cp = 0.5
-        Cp = computeCp(state) # approximate upper bound
+        Cp = 1000#computeCp(state) # approximate upper bound
         totalcount = sum(stat.count for stat in stats[state].values())
         A = 2.0*Cp*sqrt(log(totalcount))
         def ucb(stat):
-                stat.getAvgValue()+A/sqrt(stat.count)
+                return stat.getAvgValue()+A/sqrt(stat.count)
         return reduce(lambda a, b: ucb(a[1])>ucb(b[1]) and a or b,
                       stats[state].items())[0]
 
 class UCT(MCTS):
-        def __init__(self, game, samples, score_bonus = 0):
+        def __init__(self, game, samples):
                 MCTS.__init__(self, game, samples, selectUCB)
 
 class GCT(MCTS):
-        def __init__(self, game, samples, score_bonus = 0):
+        def __init__(self, game, samples):
                 MCTS.__init__(self, game, samples, selectGreedy, selectUCB)
 
 class GRT(MCTS):
-        def __init__(self, game, samples, score_bonus = 0):
+        def __init__(self, game, samples):
                 MCTS.__init__(self, game, samples, selectGreedy, selectRandom)
 
 
