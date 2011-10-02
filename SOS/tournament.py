@@ -35,7 +35,7 @@ class Conf:
 			"switches order %d\n" % self.switch_order +\
 			"repetitions: %d\n" % self.repetitions +\
 			"agents: %s\n" % agents +\
-			"score bonus: %d\n" % self.score_bonus
+			"score bonus: %s\n" % self.score_bonus
 
 
 def nameToAgent(name):
@@ -45,7 +45,7 @@ def nameToAgent(name):
 
 def usage():
     """print usage message to standart output"""
-    print "Usage: python tournament.py --size switches --min min-samples --max max-samples --step sample-step --repeat reapetions --order 0/1/2 scorebonus/winloss player-name [player-name]..."
+    print "Usage: python tournament.py --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 scorebonus/winloss player-name [player-name]..."
     
 def parseCommandLine(argList):
     """receive input for SOS Game experiment"""
@@ -77,10 +77,10 @@ def parseCommandLine(argList):
             usage()
             sys.exit(2)
     if args[0] == 'scorebonus':
-	    conf.score_bonus = 1
+	    conf.score_bonus = True
 	    agents.computeCp = agents.computeCpScoreBonus
     elif args[0] == 'winloss':
-	    conf.score_bonus = 0
+	    conf.score_bonus = False
 	    agents.computeCp = agents.computeCpWinLoss
     else:
         usage()
