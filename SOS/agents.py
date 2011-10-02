@@ -5,7 +5,6 @@ from random import random, choice
 from math import log, sqrt
 from model import *
 from copy import copy
-from matplotlib import pyplot as plt
 
 computeCp = None
 
