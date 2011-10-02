@@ -36,7 +36,7 @@ class Conf:
 			"switches order %d\n" % self.switch_order +\
 			"repetitions: %d\n" % self.repetitions +\
 			"agents: %s\n" % agents +\
-			"score bonus: %d\n" % self.score_bonus
+			"score bonus: %s\n" % self.score_bonus
 
 
 def nameToAgent(name):

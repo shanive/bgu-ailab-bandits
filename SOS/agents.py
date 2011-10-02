@@ -85,7 +85,6 @@ class MCTS(Agent):
 
                 if self.game.isFinalState(state):
 			return self.game.calcScore(state)
-                        #return self.game.scoreBonus(state)
                 else:
                         move = select(state, stats)
                         stat = stats[state][move]
@@ -137,8 +136,6 @@ def computeCpWinLoss(state):
 	return 1.0
 
 def selectUCB(state, stats):
-	# 1, -1 => Cp = 1
-	# 1, 0  => Cp = 0.5
         Cp = computeCp(state) # approximate upper bound
         totalcount = sum(stat.count for stat in stats[state].values())
         A = 2.0*Cp*sqrt(log(totalcount))
