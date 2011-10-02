@@ -184,10 +184,10 @@ class Game:
 	def calcScore(self, state):
 		"""return the first player's score.
 		The second player score is it's negation"""
-		return self.score_bonus * self.scoreBonus(state) or\
-				(1 - self.score_bonus) * self.winloss(state)
-		
-
+		if self.score_bonus:
+			return self.scoreBonus(state)
+		else:
+			return self.winloss(state)
 
 class Agent:
         """abstract agent"""
