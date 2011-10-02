@@ -8,7 +8,7 @@ import agents
 
 def usage():
 	"""prints usage message in case of missing arguments"""
-	print "Usage: python play.py --order r/a/d --values <list-values> n repetitions player1 player2"
+	print "Usage: python play.py --order r/a/d --values <list-values> n repetitions samples player1 player2"
 	
 	
 def parse(argList):
@@ -29,7 +29,6 @@ def parse(argList):
 			order = arg
 		elif opt == '--values':
 			values = list(arg)
-		
 		else:
 			print "Unvalid Option\n"
 			usage()
@@ -37,9 +36,9 @@ def parse(argList):
 	
 	game = model.Game(int(args[0]), values, order)
 	
-	firstPlayer = getattr(agents, args[2])(game)
-	secondPlayer = getattr(agents, args[3])(game)
-	
+	firstPlayer = getattr(agents, args[3])(game, int(args[2]))
+	secondPlayer = getattr(agents, args[4])(game, int(args[2]))
+	agents.computeCp = agents.computeCpWinLoss
 	play(game, int(args[1]), firstPlayer, secondPlayer)
 	
 	
@@ -53,6 +52,7 @@ def play(game, repeat, firstPlayer, secondPlayer):
 	diff = 0.0
 	for i in range(repeat):
 		diff += game.play(firstPlayer, secondPlayer)
+		game.printSamplingStat()
 	print "The average difference is: %f" %  (diff / repeat)
 
 

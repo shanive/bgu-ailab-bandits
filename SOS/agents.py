@@ -41,38 +41,6 @@ class Right(Agent):
 		return moves[len(moves) - 1]
 
 
-class MoveStat:
-        """Move statistics"""
-        def __init__(self, valuesum=0.0, count=0):
-                """initialize move statistics to unsampled state"""
-                self.valuesum = valuesum
-                self.count = count
-
-        def updateValue(self, value):
-                """receive the value of the move on a simulation and update the overall value"""
-                self.valuesum += value
-                self.count += 1
-
-        def getAvgValue(self):
-                """return the average value of this move"""
-                return self.valuesum / self.count
-
-def test_MoveStat():
-        move = MoveStat()
-        move.updateValue(0.5)
-        move.updateValue(0.3)
-        assert move.getAvgValue() == 0.4
-
-class Stats(dict):
-        "dictionary for node statistics"
-        def __getitem__(self, state):
-                "like a[b], but if b not in a, initialize to empty statistics"
-                stateid = state.id()
-                if stateid not in self:
-                        self[stateid] = dict((move, MoveStat()) \
-				           for move in state.availableMoves())
-                return dict.__getitem__(self, stateid)
-
 def selectAllThenThis(state, stats, selectThis):
         """select an unvisited action if any,
         then according to select_this"""
@@ -86,7 +54,7 @@ def bestMove(state, stats):
         with the best average value"""
         return reduce(lambda a, b: a[1].getAvgValue()>b[1].getAvgValue() and a or b,
                       stats[state].items())[0]
-
+		   
 class MCTS(Agent):
         """uniform MCTS player"""
 
@@ -99,15 +67,17 @@ class MCTS(Agent):
                     selectAllThenThis(state, stats, selectNext or selectFirst)
 
         def selectMove(self, state):
-                """receive the state of the game and return the next move"""
+                """receive the state of the game and return two values: 
+		one is the next move and the other is the state's statistics: (statistics, next move)"""
                 stats = Stats()
                 totalsamples = self.samples*len(state.availableMoves())
                 while totalsamples:
                         value = self.__simulate(self.selectFirst, copy(state), stats)
                         totalsamples-= 1
-                return bestMove(state, stats)
+		next_move = bestMove(state, stats)
+                return (next_move, stats)
 
-        def __simulate(self, select, state, stats):
+        def __simulate(self, select, state, stats,):
                 """simulate a game from a given state. return the score bonus"""
 
                 if self.game.isFinalState(state):
@@ -167,20 +137,33 @@ def selectUCB(state, stats):
         totalcount = sum(stat.count for stat in stats[state].values())
         A = 2.0*Cp*sqrt(log(totalcount))
         def ucb(stat):
-                stat.getAvgValue()+A/sqrt(stat.count)
+                return stat.getAvgValue()+A/sqrt(stat.count)
         return reduce(lambda a, b: ucb(a[1])>ucb(b[1]) and a or b,
                       stats[state].items())[0]
 
+def selectUQB(state, stats):
+        Cp = computeCp(state) # approximate upper bound
+        totalcount = sum(stat.count for stat in stats[state].values())
+        A = 2.0*Cp*sqrt(sqrt(totalcount))
+        def uqb(stat):
+                return stat.getAvgValue()+A/sqrt(stat.count)
+        return reduce(lambda a, b: uqb(a[1])>uqb(b[1]) and a or b,
+                      stats[state].items())[0]
+
 class UCT(MCTS):
-        def __init__(self, game, samples, score_bonus = 0):
+        def __init__(self, game, samples):
                 MCTS.__init__(self, game, samples, selectUCB)
 
 class GCT(MCTS):
-        def __init__(self, game, samples, score_bonus = 0):
+        def __init__(self, game, samples):
                 MCTS.__init__(self, game, samples, selectGreedy, selectUCB)
 
+class QCT(MCTS):
+        def __init__(self, game, samples):
+                MCTS.__init__(self, game, samples, selectUQB, selectUCB)
+
 class GRT(MCTS):
-        def __init__(self, game, samples, score_bonus = 0):
+        def __init__(self, game, samples):
                 MCTS.__init__(self, game, samples, selectGreedy, selectRandom)
 
 

@@ -70,7 +70,42 @@ class State:
                                 i = 2
                         n = n*3 + c
                 return n
+			
+class MoveStat:
+        """Move statistics"""
+        def __init__(self, valuesum=0.0, count=0):
+                """initialize move statistics to unsampled state"""
+                self.valuesum = valuesum
+                self.count = count
 
+        def updateValue(self, value):
+                """receive the value of the move on a simulation and update the overall value"""
+                self.valuesum += value
+                self.count += 1
+
+        def getAvgValue(self):
+                """return the average value of this move"""
+                return self.valuesum / self.count
+
+def test_MoveStat():
+        move = MoveStat()
+        move.updateValue(0.5)
+        move.updateValue(0.3)
+        assert move.getAvgValue() == 0.4
+
+			
+class Stats(dict):
+        "dictionary for node statistics"
+        def __getitem__(self, state):
+                "like a[b], but if b not in a, initialize to empty statistics"
+                stateid = state.id()
+                if stateid not in self:
+                        self[stateid] = dict((move, MoveStat()) \
+				           for move in state.availableMoves())
+                return dict.__getitem__(self, stateid)
+
+sampleStat=[]				   
+				   
 class Game:
         
         """Simulate an sos game.
@@ -114,12 +149,24 @@ class Game:
                 """simulate a game for two players"""
                 state = self.__initialState()
                 while not self.isFinalState(state):
-                        move = firstPlayer.selectMove(state)
+                        move, stats = firstPlayer.selectMove(state)
+			sampleStat.append((firstPlayer.name(), move, stats[state].items()))
                         state.whiteMove(move)
-                        move = secondPlayer.selectMove(state)
-                        state.blackMove(move)
+                        move, stats = secondPlayer.selectMove(state)
+			sampleStat.append((secondPlayer.name(), move, stats[state].items())) 
+			state.blackMove(move)
                 return self.calcScore(state)        
-                #return self.scoreBonus(state) 
+	
+	def printSamplingStat(self):
+		"""receive sampling statistics and choosen move and print statistics"""
+		global sampleStat
+		for player, move, items in sampleStat:
+			print "%s: %d" % (player ,self.values[move]),
+			for switch, switch_stat in items:
+				print "%d,%d" % (self.values[switch], switch_stat.count),
+			print 
+		sampleStat = []
+		
                 
         def __score(self, indices):
                 """return total score of switches at the indices"""
@@ -139,10 +186,10 @@ class Game:
 	def calcScore(self, state):
 		"""return the first player's score.
 		The second player score is it's negation"""
-                if self.score_bonus:
-                        return self.scoreBonus(state)
-                else:
-                        return self.winloss(state)
+		if self.score_bonus:
+			return self.scoreBonus(state)
+		else:
+			return self.winloss(state)
 
 class Agent:
         """abstract agent"""
