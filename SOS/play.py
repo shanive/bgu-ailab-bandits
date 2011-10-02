@@ -52,12 +52,13 @@ def play(game, repeat, firstPlayer, secondPlayer):
 	diff = 0.0
 	for i in range(repeat):
 		diff += game.play(firstPlayer, secondPlayer)
-		game.printSamplingStat()
-	print "The average difference is: %f" %  (diff / repeat)
+	avgDiff = diff/repeat
+	print "The average difference is: %f" % avgDiff
+	return avgDiff
 
 
 
 if __name__ == '__main__':
-	
+	agents.printSamplingStats = True
 	parse(sys.argv[1:])
 

@@ -6,6 +6,7 @@ from math import log, sqrt
 from model import *
 from copy import copy
 
+printSamplingStats = False
 computeCp = None
 
 class Random(Agent):
@@ -75,7 +76,9 @@ class MCTS(Agent):
                         value = self.__simulate(self.selectFirst, copy(state), stats)
                         totalsamples-= 1
 		next_move = bestMove(state, stats)
-                return (next_move, stats)
+		if printSamplingStats:
+			print >>sys.stderr, "TODO: print sampling stats here"
+                return next_move
 
         def __simulate(self, select, state, stats,):
                 """simulate a game from a given state. return the score bonus"""
