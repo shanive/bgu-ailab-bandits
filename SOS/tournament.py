@@ -94,16 +94,6 @@ def parseCommandLine(argList):
 	                
     return conf
 
-def twoPlayersGame(game, firstPlayer, secondPlayer, repetitions):
-    """simulate a game between two given players. return the average difference"""
-    avgDiff = 0.0
-    
-    for repeat in range(repetitions):
-        avgDiff+= game.play(firstPlayer, secondPlayer)
-        
-    return avgDiff / repetitions
-   
-    
 def simulation(conf, samples):
 	"""simulate a tournament for the given number of samples.
         return results"""
@@ -111,13 +101,15 @@ def simulation(conf, samples):
 	for i in range(len(conf.agents)):
 		for j in range(len(conf.agents)):
 			if i!=j:
-                                ai = conf.agents[i]
-                                aj = conf.agents[j]
-                                game  = model.Game(conf.number_of_switches, order  = conf.switch_order, scorebonus = conf.score_bonus)
-				avgDiff = twoPlayersGame(game,
-                                                         ai(game, samples),
-                                                         aj(game, samples),
-                                                         conf.repetitions)
+                                avgDiff = 0.0
+                                for repeat in range(conf.repetitions):
+                                        game = model.Game(conf.number_of_switches,
+                                                             order  = conf.switch_order,
+                                                             scorebonus = conf.score_bonus)
+                                        avgDiff+= game.play(conf.agents[i](game, samples),
+                                                            conf.agents[j](game, samples))
+                                avgDiff/= conf.repetitions
+
 				## update results
 				results[i]+= avgDiff
 				results[j]-= avgDiff
