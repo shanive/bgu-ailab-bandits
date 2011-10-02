@@ -144,6 +144,15 @@ def selectUCB(state, stats):
         return reduce(lambda a, b: ucb(a[1])>ucb(b[1]) and a or b,
                       stats[state].items())[0]
 
+def selectUQB(state, stats):
+        Cp = computeCp(state) # approximate upper bound
+        totalcount = sum(stat.count for stat in stats[state].values())
+        A = 2.0*Cp*sqrt(sqrt(totalcount))
+        def uqb(stat):
+                return stat.getAvgValue()+A/sqrt(stat.count)
+        return reduce(lambda a, b: uqb(a[1])>uqb(b[1]) and a or b,
+                      stats[state].items())[0]
+
 class UCT(MCTS):
         def __init__(self, game, samples):
                 MCTS.__init__(self, game, samples, selectUCB)
@@ -151,6 +160,10 @@ class UCT(MCTS):
 class GCT(MCTS):
         def __init__(self, game, samples):
                 MCTS.__init__(self, game, samples, selectGreedy, selectUCB)
+
+class QCT(MCTS):
+        def __init__(self, game, samples):
+                MCTS.__init__(self, game, samples, selectUQB, selectUCB)
 
 class GRT(MCTS):
         def __init__(self, game, samples):
