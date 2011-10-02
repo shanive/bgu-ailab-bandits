@@ -5,6 +5,7 @@ import model
 import getopt
 import agents
 from random import choice
+import cProfile
 
 
 
@@ -147,6 +148,6 @@ if __name__ == '__main__':
 	
 	print >> sys.stderr, conf 
 	
-	runTournament(conf)
+	cProfile.run('runTournament(conf)')
 	
     
