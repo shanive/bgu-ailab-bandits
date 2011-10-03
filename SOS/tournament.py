@@ -22,7 +22,7 @@ class Conf:
 		self.switch_order = Conf.RANDOM
 		self.repetitions = 1000
 		self.agents = [agents.Random, agents.Random]
-		self.score_bonus = None
+		self.score_bonus = False
 		
 	def __str__(self):
 		"""return string for print"""
@@ -46,16 +46,18 @@ def nameToAgent(name):
 
 def usage():
     """print usage message to standart output"""
-    print "Usage: python tournament.py --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 scorebonus/winloss player-name [player-name]..."
+    print "Usage: python tournament.py --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 --scorebonus player-name [player-name]..."
     
 def parseCommandLine(argList):
     """receive input for SOS Game experiment"""
     ### default values:
+    agents.computeCp = agents.computeCpWinLoss
+    
     conf = Conf()
     
     try:
         opts, args = getopt.getopt(argList,"",["min=","max=","step=", "repeat=", "order=",\
-						"size="])
+						"size=", "scorebonus"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -73,21 +75,14 @@ def parseCommandLine(argList):
             conf.repetitions = int(arg)
         elif opt == '--order' and int(arg) in (conf.RANDOM, conf.ASCENDING, conf.DESCENDING):
             conf.switch_order = int(arg)
+	elif opt == '--scorebonus':
+	    conf.score_bonus = True
+	    agents.computeCp = agents.computeCpScoreBonus
         else:
             print "Unvalid Option\n"
             usage()
             sys.exit(2)
-    if args[0] == 'scorebonus':
-	    conf.score_bonus = True
-	    agents.computeCp = agents.computeCpScoreBonus
-    elif args[0] == 'winloss':
-	    conf.score_bonus = False
-	    agents.computeCp = agents.computeCpWinLoss
-    else:
-        usage()
-        sys.exit(2)
        
-    args.pop(0)
 	    
     if args:
 	    conf.agents = [nameToAgent(name) for name in args]
@@ -140,6 +135,6 @@ if __name__ == '__main__':
 	
 	print >> sys.stderr, conf 
 	
-	cProfile.run('runTournament(conf)')
-	
+	#cProfile.run('runTournament(conf)')
+	runTournament(conf)
     

@@ -18,7 +18,7 @@ class Conf:
 		self.repetitions = 1000
 		self.firstPlayer = agents.Random
 		self.secondPlayer = agents.Random
-		self.score_bonus = None
+		self.score_bonus = False
 		self.samples_per_state = 1000
 		self.switches_values = None
 		
@@ -29,23 +29,24 @@ class Conf:
 			"switches order %d\n" % self.switch_order +\
 			"repetitions: %d\n" % self.repetitions +\
 			"players: %s %s\n" % (self.firstPlayer.__name__, self.secondPlayer.__name__) +\
-			"score bonus: %s\n" % self.score_bonus +\
+			"score bonus: %s\n" % str(self.score_bonus) +\
 			"samples per state: %s\n" % self.samples_per_state +\
 			"switches values: %s\n" % str(self.switches_values) 
 
 
 def usage():
 	"""prints usage message in case of missing arguments"""
-	print "Usage: python play.py --order 0/1/2 --values <list-values> n repetitions samples scorebonus/winloss player1 player2"
+	print "Usage: python play.py --order 0/1/2 --values <list-values> --scorebonus n repetitions samples player1 player2"
 	
 	
 def parseCommandLine(argList):
 	"""receive size, players' names and repetitions number as input and begin the play"""
+	agents.computeCp = agents.computeCpWinLoss #default value
 	
 	conf = Conf()
 	
 	try:
-		opts, args = getopt.getopt(argList, "", ["order=", "values="])
+		opts, args = getopt.getopt(argList, "", ["order=", "values=", "scorebonus"])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -55,6 +56,9 @@ def parseCommandLine(argList):
 			conf.switch_order = arg
 		elif opt == '--values':
 			conf.switches_values = list(arg)
+		elif opt == '--scorebonus':
+			conf.score_bonus = True
+			agents.computeCp = agents.computeCpScoreBonus
 		else:
 			print "Unvalid Option\n"
 			usage()
@@ -63,14 +67,9 @@ def parseCommandLine(argList):
 	conf.number_of_switches = int(args[0])
 	conf.repetitions = int(args[1])
 	conf.samples_per_state = float(args[2])
-	if args[3] == 'scorebonus':
-		conf.score_bonus = True
-		agents.computeCp = agents.computeCpScoreBonus
-	elif args[3] == 'winloss':
-		conf.score_bonus = False
-		agents.computeCp = agents.computeCpWinLoss
+		
+	conf.firstPlayer = getattr(agents, args[3])
 	conf.firstPlayer = getattr(agents, args[4])
-	conf.firstPlayer = getattr(agents, args[5])
 	
 	return conf
 		
