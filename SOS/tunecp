@@ -1,0 +1,9 @@
+#!/bin/bash
+
+CPS=`python -c 'import  math; print " ".join([str(0.125*math.sqrt(2)**a) for a in range(9)])'`
+
+for Cp in $CPS
+do
+	# something
+	echo $Cp
+done
