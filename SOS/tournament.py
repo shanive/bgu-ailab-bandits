@@ -23,6 +23,7 @@ class Conf:
 		self.repetitions = 1000
 		self.agents = [agents.Random, agents.Random]
 		self.score_bonus = False
+		self.cp = None
 		
 	def __str__(self):
 		"""return string for print"""
@@ -36,7 +37,9 @@ class Conf:
 			"switches order %d\n" % self.switch_order +\
 			"repetitions: %d\n" % self.repetitions +\
 			"agents: %s\n" % agents +\
-			"score bonus: %s\n" % self.score_bonus
+			"score bonus: %s\n" % self.score_bonus +\
+			"cp: %f\n" % self.cp
+			
 
 
 def nameToAgent(name):
@@ -46,7 +49,7 @@ def nameToAgent(name):
 
 def usage():
     """print usage message to standart output"""
-    print "Usage: python tournament.py --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 --scorebonus player-name [player-name]..."
+    print "Usage: python tournament.py --cp <cp-value> --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 --scorebonus player-name [player-name]..."
     
 def parseCommandLine(argList):
     """receive input for SOS Game experiment"""
@@ -57,7 +60,7 @@ def parseCommandLine(argList):
     
     try:
         opts, args = getopt.getopt(argList,"",["min=","max=","step=", "repeat=", "order=",\
-						"size=", "scorebonus"])
+						"size=", "scorebonus", "Cp="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -78,6 +81,9 @@ def parseCommandLine(argList):
 	elif opt == '--scorebonus':
 	    conf.score_bonus = True
 	    agents.computeCp = agents.computeCpScoreBonus
+	elif opt == '--Cp':
+	    conf.cp = float(arg)
+	    agents.computeCp = lambda state: conf.cp 
         else:
             print "Unvalid Option\n"
             usage()
