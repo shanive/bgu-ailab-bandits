@@ -77,8 +77,15 @@ class MCTS(Agent):
                         totalsamples-= 1
 		next_move = bestMove(state, stats)
 		if printSamplingStats:
-			print >>sys.stderr, "TODO: print sampling stats here"
+			self.__printSamplingStats(stats, state)
                 return next_move
+		
+	def __printSamplingStats(self, stats, state):
+		"""print sampling statistics"""
+		print "%s:" % self.name(),
+		for move, stat in stats[state].items():
+			print "%d,%d" % (self.game.values[move], stat.count),
+		print
 
         def __simulate(self, select, state, stats,):
                 """simulate a game from a given state. return the score bonus"""
