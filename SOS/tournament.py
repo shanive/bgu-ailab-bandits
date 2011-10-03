@@ -140,7 +140,9 @@ if __name__ == '__main__':
 	conf = parseCommandLine(sys.argv[1:])
 	
 	print >> sys.stderr, conf 
-	
+		
+	# profiling commented out temporarily, please implement
+    # with command line option
 	#cProfile.run('runTournament(conf)')
 	runTournament(conf)
     
