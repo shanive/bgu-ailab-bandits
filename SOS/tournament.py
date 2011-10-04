@@ -7,7 +7,7 @@ import getopt
 import agents
 from random import choice
 import cProfile
-
+import pstats
 
 
 class Conf:
@@ -149,7 +149,10 @@ if __name__ == '__main__':
 	# profiling commented out temporarily, please implement
     # with command line option
 	if conf.profile:
-		cProfile.run('runTournament(conf)')
+		cProfile.run('runTournament(conf)','profile.txt')
+		profile = pstats.Stats('profile')
+		profile.sort_stats('time').print_stats()
+		
 	else:
 		runTournament(conf)
 
