@@ -1,3 +1,4 @@
+#!usr/bin/python
 """this module contain an experiment on sos game"""
 
 import sys
@@ -141,6 +142,6 @@ if __name__ == '__main__':
 	
 	print >> sys.stderr, conf 
 	
-	#cProfile.run('runTournament(conf)')
-	runTournament(conf)
+	cProfile.run('runTournament(conf)', 'profile.txt')
+	#runTournament(conf)
     
