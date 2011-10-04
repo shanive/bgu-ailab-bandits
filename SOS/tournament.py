@@ -24,7 +24,8 @@ class Conf:
 		self.repetitions = 1000
 		self.agents = [agents.Random, agents.Random]
 		self.score_bonus = False
-		self.cp = None
+		self.cp = 0.0
+		self.profile = False
 		
 	def __str__(self):
 		"""return string for print"""
@@ -39,7 +40,8 @@ class Conf:
 			"repetitions: %d\n" % self.repetitions +\
 			"agents: %s\n" % agents +\
 			"score bonus: %s\n" % self.score_bonus +\
-			"cp: %f\n" % self.cp
+			"cp: %f\n" % self.cp +\
+			"profile output file: %s\n" % str(self.profile)
 			
 
 
@@ -50,7 +52,7 @@ def nameToAgent(name):
 
 def usage():
     """print usage message to standart output"""
-    print "Usage: python tournament.py --cp <cp-value> --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 --scorebonus player-name [player-name]..."
+    print "Usage: python tournament.py --cp <cp-value> --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 --scorebonus --profile player-name [player-name]..."
     
 def parseCommandLine(argList):
     """receive input for SOS Game experiment"""
@@ -61,7 +63,7 @@ def parseCommandLine(argList):
     
     try:
         opts, args = getopt.getopt(argList,"",["min=","max=","step=", "repeat=", "order=",\
-						"size=", "scorebonus", "Cp="])
+						"size=", "scorebonus", "Cp=", "profile"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -85,6 +87,8 @@ def parseCommandLine(argList):
 	elif opt == '--Cp':
 	    conf.cp = float(arg)
 	    agents.computeCp = lambda state: conf.cp 
+	elif opt == '--profile':
+	    conf.profile = True
         else:
             print "Unvalid Option\n"
             usage()
@@ -142,6 +146,11 @@ if __name__ == '__main__':
 	
 	print >> sys.stderr, conf 
 	
-	cProfile.run('runTournament(conf)', 'profile.txt')
-	#runTournament(conf)
+	# profiling commented out temporarily, please implement
+    # with command line option
+	if conf.profile:
+		cProfile.run('runTournament(conf)')
+	else:
+		runTournament(conf)
+
     
