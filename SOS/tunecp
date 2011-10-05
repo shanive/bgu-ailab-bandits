@@ -4,5 +4,5 @@ CPS=`python -c 'import  math; print " ".join([str(0.125*math.sqrt(2)**a) for a i
 
 for Cp in $CPS
 do
-	python tournament.py --min 1 --max 100 --step 1.5 --repeat 1000 --Cp $Cp Uniform UCT > uniform-uct-Cp=$Cp.log;
+	python tournament.py --min 1 --max 10 --step 1.5 --repeat 10 --Cp $Cp Uniform UCT > uniform-uct-Cp=$Cp.log;
 done

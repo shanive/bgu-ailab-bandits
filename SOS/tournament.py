@@ -149,9 +149,9 @@ if __name__ == '__main__':
 	# profiling commented out temporarily, please implement
     # with command line option
 	if conf.profile:
-		cProfile.run('runTournament(conf)','profile.txt')
+		cProfile.run('runTournament(conf)','profile')
 		profile = pstats.Stats('profile')
-		profile.sort_stats('time').print_stats()
+		profile.sort_stats('time').print_stats(0.5)
 		
 	else:
 		runTournament(conf)
