@@ -57,7 +57,7 @@ class State:
         def blacks(self): return self.__someMoves(State.BLACK)
 
         def id(self):
-                """returns unique identifier of the state,
+		"""compute unique identifier of the state,
                 used for gathering state/action statistics"""
                 n = 0
                 for c in self.colors:
