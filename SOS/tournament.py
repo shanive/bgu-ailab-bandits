@@ -6,9 +6,6 @@ import model
 import getopt
 import agents
 from random import choice
-import cProfile
-import pstats
-
 
 class Conf:
 	"""configuration of tournament"""
@@ -24,7 +21,7 @@ class Conf:
 		self.repetitions = 1000
 		self.agents = [agents.Random, agents.Random]
 		self.score_bonus = False
-		self.cp = 0.0
+		self.cp = None
 		self.profile = False
 		
 	def __str__(self):
@@ -40,7 +37,7 @@ class Conf:
 			"repetitions: %d\n" % self.repetitions +\
 			"agents: %s\n" % agents +\
 			"score bonus: %s\n" % self.score_bonus +\
-			"cp: %f\n" % self.cp +\
+			"cp: %s\n" % self.cp +\
 			"profile output file: %s\n" % str(self.profile)
 			
 
@@ -89,6 +86,9 @@ def parseCommandLine(argList):
 	    agents.computeCp = lambda state: conf.cp 
 	elif opt == '--profile':
 	    conf.profile = True
+            global cProfile, pstats
+            import cProfile
+            import pstats
         else:
             print "Unvalid Option\n"
             usage()
@@ -139,8 +139,13 @@ def runTournament(conf):
 	print
 
         samples *= conf.sample_step  
-        
-        
+
+def profileTournament(conf):        
+        """run the tournament with profiling"""
+        cProfile.run('runTournament(conf)','profile')
+        profile = pstats.Stats('profile')
+        profile.sort_stats('time').print_stats(0.5)
+       
 if __name__ == '__main__':
 	conf = parseCommandLine(sys.argv[1:])
 	
@@ -149,10 +154,7 @@ if __name__ == '__main__':
 	# profiling commented out temporarily, please implement
     # with command line option
 	if conf.profile:
-		cProfile.run('runTournament(conf)','profile')
-		profile = pstats.Stats('profile')
-		profile.sort_stats('time').print_stats(0.5)
-		
+                profileTournament(conf)
 	else:
 		runTournament(conf)
 
