@@ -68,7 +68,7 @@ class State:
                                 i = 1
                         elif c==State.BLACK:
                                 i = 2
-                        n = n*3 + c
+                        n = n*3 + i
                 return n
 			
 class MoveStat:
