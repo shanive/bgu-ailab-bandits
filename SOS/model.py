@@ -22,10 +22,10 @@ class State:
         WHITE = 1
         BLACK = 2
         
-        def __init__(self, n=None):
+        def __init__(self, n=0):
                 """receive the number of moves in the game"""
                 self.size = n
-                if n: self.colors = [State.GRAY]*n
+                self.colors = [State.GRAY]*n
                 self.turn = State.WHITE
                 self.idmemo = None
                 self.movememo = {}
