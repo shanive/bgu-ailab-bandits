@@ -22,10 +22,10 @@ class State:
         WHITE = 1
         BLACK = 2
         
-        def __init__(self, n):
+        def __init__(self, n=None):
                 """receive the number of moves in the game"""
                 self.size = n
-                self.colors = [State.GRAY]*n
+                if n: self.colors = [State.GRAY]*n
                 self.turn = State.WHITE
                 self.idmemo = None
                 self.movememo = {}
@@ -33,8 +33,12 @@ class State:
         def __copy__(self):
                 """implementation of deepcopy,
                 returns a copy of the state for simulation"""
-                state = State(len(self.colors))
+                state = State()
+                state.size = self.size
                 state.colors = self.colors[:]
+                state.turn = self.turn
+                state.idmemo = self.idmemo
+                state.movememo = self.movememo
                 return state
 
         def __someMoves(self, color):
@@ -67,9 +71,11 @@ class State:
 		"""compute unique identifier of the state,
                 used for gathering state/action statistics"""
                 if self.idmemo is None:
-                        self.idmemo = reduce(lambda n, i: n*3+i, self.colors, 0)
+                        n = 0
+                        for c in self.colors:
+                                n = n*3 + c
+                        self.idmemo = n
                 return self.idmemo
-
 			
 class MoveStat:
         """Move statistics"""
