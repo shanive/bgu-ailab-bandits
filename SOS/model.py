@@ -22,7 +22,7 @@ class State:
         WHITE = 1
         BLACK = -1
         
-        def __init__(self, n):
+        def __init__(self, n=0):
                 """receive the number of moves in the game"""
                 self.size = n
                 self.colors = [State.GRAY]*n
@@ -31,8 +31,10 @@ class State:
         def __copy__(self):
                 """implementation of deepcopy,
                 returns a copy of the state for simulation"""
-                state = State(len(self.colors))
+                state = State()
+                state.size = self.size
                 state.colors = self.colors[:]
+                state.turn = self.turn
                 return state
 
         def __someMoves(self, color):
