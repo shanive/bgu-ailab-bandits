@@ -20,13 +20,15 @@ class State:
         
         GRAY = 0
         WHITE = 1
-        BLACK = -1
+        BLACK = 2
         
         def __init__(self, n=0):
                 """receive the number of moves in the game"""
                 self.size = n
                 self.colors = [State.GRAY]*n
                 self.turn = State.WHITE
+                self.idmemo = None
+                self.movememo = {}
                 
         def __copy__(self):
                 """implementation of deepcopy,
@@ -35,12 +37,18 @@ class State:
                 state.size = self.size
                 state.colors = self.colors[:]
                 state.turn = self.turn
+                state.idmemo = self.idmemo
+                state.movememo = self.movememo
                 return state
 
         def __someMoves(self, color):
                 return [i for i in range(len(self.colors)) if self.colors[i]==color]
         
-        def availableMoves(self): return self.__someMoves(State.GRAY)
+        def availableMoves(self): 
+                stateid = self.id()
+                if stateid not in self.movememo:
+                        self.movememo[stateid] = self.__someMoves(State.GRAY)
+                return self.movememo[stateid]
         
         def __move(self, i, color):
                 assert self.colors[i]==State.GRAY
@@ -49,6 +57,7 @@ class State:
                         self.turn = State.BLACK
                 else:
                         self.turn = State.WHITE
+                self.idmemo = None
 
         def isWhiteTurn(self): return self.turn==State.WHITE
 
@@ -61,17 +70,12 @@ class State:
         def id(self):
 		"""compute unique identifier of the state,
                 used for gathering state/action statistics"""
-                n = 0
-                for c in self.colors:
-                        i = None
-                        if c==State.GRAY:
-                                i = 0
-                        elif c==State.WHITE:
-                                i = 1
-                        elif c==State.BLACK:
-                                i = 2
-                        n = n*3 + i
-                return n
+                if self.idmemo is None:
+                        n = 0
+                        for c in self.colors:
+                                n = n*3 + c
+                        self.idmemo = n
+                return self.idmemo
 			
 class MoveStat:
         """Move statistics"""
