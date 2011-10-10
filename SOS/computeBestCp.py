@@ -28,7 +28,7 @@ def bestCp(medians):
 	"""receive list of results' median and return the best cp value"""
 	best_cp_indx = 0
 	for i in range(1, num_of_Cps):
-		if medians[best_cp_indx]>medians[i]:
+		if medians[best_cp_indx]<medians[i]:
 			best_cp_indx = i
 	return serialCp(best_cp_indx)	
 
