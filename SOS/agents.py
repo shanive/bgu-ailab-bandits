@@ -180,7 +180,7 @@ def selectVOI(state, stats, voi):
 def voiHoeffding(stat, alpha, beta):
 
 	def estimate(n, over, under):
-		return over*exp(-2.0*n*under*under)/n
+		return over*exp(-0.5*n*under*under)/n
 
 	avg = stat.getAvgValue()
 	voi = avg > beta \
@@ -210,11 +210,11 @@ def bisection(f, a, b, eps):
 def voiEyal(stat, alpha, beta):
 	def estimate(n, over, under):
 		def destim(between):
-			return 4.0*n*over*between*exp(-2.0*n*between*between) \
-				- exp(-2.0*n*under*under)
+			return 4.0*n*over*between*exp(-0.5*n*between*between) \
+				- exp(-0.5*n*under*under)
 		between = bisection(destim, under, under+over, 0.001)
-	   	return ((between-under)*exp(-2.0*n*under*under) \
-					+ over*exp(-2.0*n*between*between))/n
+	   	return ((between-under)*exp(-0.5*n*under*under) \
+					+ over*exp(-0.5*n*between*between))/n
 
 	avg = stat.getAvgValue()
 	return avg > beta \
