@@ -160,19 +160,10 @@ def selectUQB(state, stats):
 	return reduce(lambda a, b: uqb(a[1])>uqb(b[1]) and a or b,
 			  stats[state].items())[0]
 
-def selectHoeffding(state, stats):
-	alpha = 0.0
-	beta = 0.0
+def selectVOI(state, stats, voi):
+	alpha = -1.0
+	beta = -1.0
 	
-	def estimate(n, over, under):
-		return over*exp(-2.0*n*under*under)/n
-	def voi(stat):
-		avg = stat.getAvgValue()
-		voi =  avg > beta \
-			and estimate(stat.count, 1+beta, avg-beta) \
-			or estimate(stat.count, 1-alpha, alpha-avg)
-		return voi
-
 	for stat in stats[state].values():
 		avg = stat.getAvgValue()
 		if avg > alpha:
@@ -182,24 +173,82 @@ def selectHoeffding(state, stats):
 			beta = avg
 
 	return reduce(lambda a, b:
-				  voi(a[1])>voi(b[1]) and a or b,
-			  stats[state].items())[0]
+					  voi(a[1], alpha, beta) > voi(b[1], alpha, beta) \
+					  and a or b,
+				  stats[state].items())[0]
+
+def voiHoeffding(stat, alpha, beta):
+
+	def estimate(n, over, under):
+		return over*exp(-2.0*n*under*under)/n
+
+	avg = stat.getAvgValue()
+	voi = avg > beta \
+		and estimate(stat.count, 1+beta, avg-beta) \
+		or estimate(stat.count, 1-alpha, alpha-avg)
+	return voi
+
+def selectHoeffding(state, stats):
+	return selectVOI(state, stats, voiHoeffding)
+
+# Hoeffding with Eyal's correction
+def bisection(f, a, b, eps):
+	"solving non-linear equation f(x)=0 by bisection"
+	fa, fb = f(a), f(b)
+	while True:
+		if (fa>=0.0)==(fb>=0.0):
+			return a
+		c = 0.5*(a+b)
+		if abs(a-b) <= eps:
+			return c
+		fc = f(c)
+		if (fb>=0)==(fc>=0):
+			b, fb = c, fc
+		else:
+			a, fa = c, fc
+		
+def voiEyal(stat, alpha, beta):
+	def estimate(n, over, under):
+		def destim(between):
+			return 4.0*over*between*exp(-2.0*n*between*between) \
+				- exp(-2.0*n*under*under)
+		between = bisection(destim, under, under+over, 0.001)
+		return (between-under)*exp(-2.0*n*under*under) \
+			+ over*exp(-2.0*n*between*between)
+
+	avg = stat.getAvgValue()
+	voi = avg > beta \
+		and estimate(stat.count, 1+beta, avg-beta) \
+		or estimate(stat.count, 1-alpha, alpha-avg)
+	return voi
+
+def selectEyal(state, stats):
+	return selectVOI(state, stats, voiEyal)
 
 class UCT(MCTS):
+	"just plain UCT"
 	def __init__(self, game, samples):
 		MCTS.__init__(self, game, samples, selectUCB)
 
 class GCT(MCTS):
+	"0.5-greedy then UCT"
 	def __init__(self, game, samples):
 		MCTS.__init__(self, game, samples, selectGreedy, selectUCB)
 
 class QCT(MCTS):
+	"sqrt(sqrt) then UCT"
 	def __init__(self, game, samples):
 		MCTS.__init__(self, game, samples, selectUQB, selectUCB)
 
 class HCT(MCTS):
+	"Hoeffding VOI then UCT"
 	def __init__(self, game, samples):
 		MCTS.__init__(self, game, samples, selectHoeffding, selectUCB)
+
+class ECT(MCTS):
+	"Hoeffding VOI with Eyal's correction, then UCT"
+	def __init__(self, game, samples):
+		MCTS.__init__(self, game, samples, selectEyal, selectUCB)
 
 class GRT(MCTS):
 	def __init__(self, game, samples):
