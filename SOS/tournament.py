@@ -79,7 +79,11 @@ def parseCommandLine(argList):
 	    agentsList = [nameToAgent(name) for name in args]
     else:
 	    agentsList = []
-	     
+    if options.profile:
+                import cProfile
+                import pstats
+                global cProfile
+                global pstats	     
     return Conf(options, agentsList)
    
 

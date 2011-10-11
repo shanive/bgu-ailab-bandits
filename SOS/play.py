@@ -1,7 +1,6 @@
 """simulation of games for testing"""
 
 ### 
-import getopt
 import sys
 import model
 import agents
@@ -65,7 +64,11 @@ def parseCommandLine(argList):
 	    agents.computeCp = agents.computeCpScoreBonus
     	else:
 	    agents.computeCp = agents.computeCpWinLoss
-	
+	if options.profile:
+		import cProfile
+		import pstats
+		global cProfile
+		global pstats
 	return Conf(options, nameToAgent(args[0]), nameToAgent(args[1]))
 
 	
