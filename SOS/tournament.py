@@ -100,10 +100,10 @@ def simulation(conf, samples):
 									  scorebonus = conf.score_bonus)
 					avgDiff+= game.play(conf.agents[i](game, samples),
 										conf.agents[j](game, samples))
-					avgDiff/= conf.repetitions
-                    # update results
-					results[i]+= avgDiff
-					results[j]-= avgDiff
+				avgDiff/= conf.repetitions
+				# update results
+				results[i]+= avgDiff
+				results[j]-= avgDiff
 	return results
         
 def runTournament(conf):

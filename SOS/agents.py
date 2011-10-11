@@ -244,6 +244,11 @@ class HCT(MCTS):
 	def __init__(self, game, samples):
 		MCTS.__init__(self, game, samples, selectHoeffding, selectUCB)
 
+class HRT(MCTS):
+	"Hoeffding VOI then Random"
+	def __init__(self, game, samples):
+		MCTS.__init__(self, game, samples, selectHoeffding, selectRandom)
+
 class ECT(MCTS):
 	"Hoeffding VOI with Eyal's correction, then UCT"
 	def __init__(self, game, samples):
