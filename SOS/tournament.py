@@ -6,23 +6,27 @@ import model
 import getopt
 import agents
 from random import choice
+from optparse import OptionParser
 
 class Conf:
 	"""configuration of tournament"""
 	RANDOM = 0
 	ASCENDING = 1
 	DESCENDING = 2
-	def __init__(self):
-		self.number_of_switches = 10
-		self.min_samples_per_action = 10
-		self.max_samples_per_action = 1000
-		self.sample_step = 2.0
-		self.switch_order = Conf.RANDOM
-		self.repetitions = 1000
-		self.agents = [agents.Random, agents.Random]
-		self.score_bonus = False
-		self.cp = None
-		self.profile = False
+	def __init__(self, options, agentsList):
+		self.number_of_switches = options.size
+		self.min_samples_per_action = options.min
+		self.max_samples_per_action = options.max
+		self.sample_step = options.step
+		if options.order in (self.RANDOM, self.ASCENDING, self.DESCENDING):
+			 self.switch_order = options.order
+		else:
+			 self.switch_order = self.RANDOM
+		self.repetitions = options.repeat
+		self.agents = agentsList or [agents.Random, agents.Random]
+		self.score_bonus = options.scorebonus
+		self.cp = options.Cp
+		self.profile = options.profile
 		
 	def __str__(self):
 		"""return string for print"""
@@ -32,13 +36,13 @@ class Conf:
 		return "number of switches: %d\n" % self.number_of_switches + \
 			"min samples per action: %d\n" % self.min_samples_per_action +\
 			"max samples per action: %d\n" % self.max_samples_per_action  +\
-			"sample step: %d\n" % self.sample_step +\
+			"sample step: %f\n" % self.sample_step +\
 			"switches order %d\n" % self.switch_order +\
 			"repetitions: %d\n" % self.repetitions +\
 			"agents: %s\n" % agents +\
 			"score bonus: %s\n" % self.score_bonus +\
 			"cp: %s\n" % self.cp +\
-			"profile output file: %s\n" % str(self.profile)
+			"profile: %s\n" % str(self.profile)
 			
 
 
@@ -46,59 +50,41 @@ def nameToAgent(name):
 	"""receive agent's name and return referrence to the corresponding agent's class"""
 	return getattr(agents, name)
 
-
-def usage():
-    """print usage message to standart output"""
-    print "Usage: python tournament.py --Cp <cp-value> --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 --scorebonus --profile player-name [player-name]..."
-    
 def parseCommandLine(argList):
     """receive input for SOS Game experiment"""
-    ### default values:
-    agents.computeCp = agents.computeCpWinLoss
+
+    usage = "usage: %prog [options] player-name [player-name] ..."
+
+    parser = OptionParser(usage = usage)
+    parser.add_option("--size", type = "int", dest = "size", default = 10, help = "number of switches [default: %default]")
+    parser.add_option("--min", type = "int", dest = "min", default = 10, help = "min samples per action [default: %default]")
+    parser.add_option("--max", type = "int", dest = "max", default = 1000, help = "max samples per action [default: %default]")
+    parser.add_option("--step", type = "float", dest = "step", default = 2.0, help = "sample step [default: %default]")
+    parser.add_option("--repeat", type = "int", dest = "repeat", default = 1000, help = "repetitions of each game [default: %default]")
+    parser.add_option("--order", type = "int", dest = "order", default = 0, help = "switches' values order [default: %default]") ##### todo
+    parser.add_option("--scorebonus", action = "store_true", dest = "scorebonus", default = False, help = "players' reward [default: %default]" )
+    parser.add_option("--Cp", type = "float", dest = "Cp", help = "cp value in UCT function" )
+    parser.add_option("--profile", action = "store_true", dest = "profile", default = False, help = "print profile [default: %default]")
     
-    conf = Conf()
-    
-    try:
-        opts, args = getopt.getopt(argList,"",["min=","max=","step=", "repeat=", "order=",\
-						"size=", "scorebonus", "Cp=", "profile"])
-    except getopt.GetoptError:
-        usage()
-        sys.exit(2)
-    
-    for opt,arg in opts:
-	if opt == '--size':
-		conf.number_of_switches = int(arg)
-        elif opt == '--min':
-            conf.min_samples_per_action = float(arg)
-        elif opt == '--max':
-            conf.max_samples_per_action = float(arg)
-        elif opt == '--step':
-            conf.sample_step = float(arg)
-        elif opt == '--repeat':
-            conf.repetitions = int(arg)
-        elif opt == '--order' and int(arg) in (conf.RANDOM, conf.ASCENDING, conf.DESCENDING):
-            conf.switch_order = int(arg)
-	elif opt == '--scorebonus':
-	    conf.score_bonus = True
+    (options, args) = parser.parse_args()
+
+    if options.Cp:
+	    agents.computeCp = lambda state: option.Cp
+    elif options.scorebonus:
 	    agents.computeCp = agents.computeCpScoreBonus
-	elif opt == '--Cp':
-	    conf.cp = float(arg)
-	    agents.computeCp = lambda state: conf.cp 
-	elif opt == '--profile':
-	    conf.profile = True
-            global cProfile, pstats
-            import cProfile
-            import pstats
-        else:
-            print "Unvalid Option\n"
-            usage()
-            sys.exit(2)
-       
-	    
+    else:
+	    agents.computeCp = agents.computeCpWinLoss
     if args:
-	    conf.agents = [nameToAgent(name) for name in args]
-	                
-    return conf
+	    agentsList = [nameToAgent(name) for name in args]
+    else:
+	    agentsList = []
+    if options.profile:
+                import cProfile
+                import pstats
+                global cProfile
+                global pstats	     
+    return Conf(options, agentsList)
+   
 
 def simulation(conf, samples):
 	"""simulate a tournament for the given number of samples.
@@ -107,19 +93,19 @@ def simulation(conf, samples):
 	for i in range(len(conf.agents)):
 		for j in range(len(conf.agents)):
 			if i!=j:
-                                avgDiff = 0.0
-                                for repeat in range(conf.repetitions):
-                                        game = model.Game(conf.number_of_switches,
-                                                             order  = conf.switch_order,
-                                                             scorebonus = conf.score_bonus)
-                                        avgDiff+= game.play(conf.agents[i](game, samples),
-                                                            conf.agents[j](game, samples))
-                                avgDiff/= conf.repetitions
+				avgDiff = 0.0
+				for repeat in range(conf.repetitions):
+					game = model.Game(conf.number_of_switches,
+									  order  = conf.switch_order,
+									  scorebonus = conf.score_bonus)
+					avgDiff+= game.play(conf.agents[i](game, samples),
+										conf.agents[j](game, samples))
+					avgDiff/= conf.repetitions
 
 				## update results
 				results[i]+= avgDiff
 				results[j]-= avgDiff
-        return results
+	return results
         
 def runTournament(conf):
     """excecute the tournament and print results. """
