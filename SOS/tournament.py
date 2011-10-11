@@ -75,7 +75,7 @@ def parseCommandLine(argList):
 	    agents.computeCp = agents.computeCpScoreBonus
     else:
 	    agents.computeCp = agents.computeCpWinLoss
-    if not args:
+    if args:
 	    agentsList = [nameToAgent(name) for name in args]
     else:
 	    agentsList = []
