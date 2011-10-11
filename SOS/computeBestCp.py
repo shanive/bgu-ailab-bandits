@@ -3,8 +3,8 @@ from math import sqrt
 from math import exp
 
 num_of_Cps = 9
-min_samples = 1
-sample_step = 1.5
+min_samples = 10
+sample_step = 2
 
 
 """this program reads results of the cp experiment from log file and computes the best cp value"""
