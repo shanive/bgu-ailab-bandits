@@ -69,7 +69,7 @@ def parseCommandLine(argList):
     (options, args) = parser.parse_args()
 
     if options.Cp:
-	    agents.computeCp = lambda state: option.Cp
+	    agents.computeCp = lambda state: options.Cp
     elif options.scorebonus:
 	    agents.computeCp = agents.computeCpScoreBonus
     else:
@@ -79,17 +79,17 @@ def parseCommandLine(argList):
     else:
 	    agentsList = []
     if options.profile:
-                import cProfile
-                import pstats
-                global cProfile
-                global pstats	     
+		import cProfile
+		import pstats
+		global cProfile
+		global pstats	     
     return Conf(options, agentsList)
    
 
 def simulation(conf, samples):
 	"""simulate a tournament for the given number of samples.
-        return results"""
-        results = [0.0 for a in conf.agents]
+	return results"""
+	results = [0.0 for a in conf.agents]
 	for i in range(len(conf.agents)):
 		for j in range(len(conf.agents)):
 			if i!=j:
@@ -101,10 +101,9 @@ def simulation(conf, samples):
 					avgDiff+= game.play(conf.agents[i](game, samples),
 										conf.agents[j](game, samples))
 					avgDiff/= conf.repetitions
-
-				## update results
-				results[i]+= avgDiff
-				results[j]-= avgDiff
+                    # update results
+					results[i]+= avgDiff
+					results[j]-= avgDiff
 	return results
         
 def runTournament(conf):
