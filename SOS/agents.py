@@ -51,7 +51,7 @@ def selectAllThenThis(state, stats, selectThis):
         return selectThis(state, stats)
 
 def bestMove(state, stats):
-        """receive list of Move objects and return the index of the move
+        """receive list of Move objects and return the of the move
         with the best average value"""
         return reduce(lambda a, b: a[1].getAvgValue()>b[1].getAvgValue() and a or b,
                       stats[state].items())[0]
