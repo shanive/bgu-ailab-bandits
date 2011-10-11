@@ -210,17 +210,16 @@ def bisection(f, a, b, eps):
 def voiEyal(stat, alpha, beta):
 	def estimate(n, over, under):
 		def destim(between):
-			return 4.0*over*between*exp(-2.0*n*between*between) \
+			return 4.0*n*over*between*exp(-2.0*n*between*between) \
 				- exp(-2.0*n*under*under)
 		between = bisection(destim, under, under+over, 0.001)
-		return (between-under)*exp(-2.0*n*under*under) \
-			+ over*exp(-2.0*n*between*between)
+	   	return ((between-under)*exp(-2.0*n*under*under) \
+					+ over*exp(-2.0*n*between*between))/n
 
 	avg = stat.getAvgValue()
-	voi = avg > beta \
+	return avg > beta \
 		and estimate(stat.count, 1+beta, avg-beta) \
 		or estimate(stat.count, 1-alpha, alpha-avg)
-	return voi
 
 def selectEyal(state, stats):
 	return selectVOI(state, stats, voiEyal)

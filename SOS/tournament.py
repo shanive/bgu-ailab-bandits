@@ -32,7 +32,7 @@ class Conf:
 		return "number of switches: %d\n" % self.number_of_switches + \
 			"min samples per action: %d\n" % self.min_samples_per_action +\
 			"max samples per action: %d\n" % self.max_samples_per_action  +\
-			"sample step: %d\n" % self.sample_step +\
+			"sample step: %f\n" % self.sample_step +\
 			"switches order %d\n" % self.switch_order +\
 			"repetitions: %d\n" % self.repetitions +\
 			"agents: %s\n" % agents +\
@@ -107,19 +107,19 @@ def simulation(conf, samples):
 	for i in range(len(conf.agents)):
 		for j in range(len(conf.agents)):
 			if i!=j:
-                                avgDiff = 0.0
-                                for repeat in range(conf.repetitions):
-                                        game = model.Game(conf.number_of_switches,
-                                                             order  = conf.switch_order,
-                                                             scorebonus = conf.score_bonus)
-                                        avgDiff+= game.play(conf.agents[i](game, samples),
-                                                            conf.agents[j](game, samples))
-                                avgDiff/= conf.repetitions
+				avgDiff = 0.0
+				for repeat in range(conf.repetitions):
+					game = model.Game(conf.number_of_switches,
+									  order  = conf.switch_order,
+									  scorebonus = conf.score_bonus)
+					avgDiff+= game.play(conf.agents[i](game, samples),
+										conf.agents[j](game, samples))
+					avgDiff/= conf.repetitions
 
 				## update results
 				results[i]+= avgDiff
 				results[j]-= avgDiff
-        return results
+	return results
         
 def runTournament(conf):
     """excecute the tournament and print results. """
