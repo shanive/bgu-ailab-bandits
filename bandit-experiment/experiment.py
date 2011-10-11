@@ -97,7 +97,7 @@ def calcAverageRegret(pullsNum, repetitions, algorithms, bandit):
 			#strToPrint += "%-10f " % results[row][col]
 		#strToPrint += '\n'
 	
-	print strToPrint
+	#print strToPrint
 	
 def readAvgFromFile(fileName):
 	"""returns a list of averages that was read from a given file"""
