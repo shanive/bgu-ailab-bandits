@@ -49,7 +49,7 @@ def nameToAgent(name):
 
 def usage():
     """print usage message to standart output"""
-    print "Usage: python tournament.py --cp <cp-value> --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 --scorebonus --profile player-name [player-name]..."
+    print "Usage: python tournament.py --Cp <cp-value> --size switches --min min-samples --max max-samples --step sample-step --repeat repetitions --order 0/1/2 --scorebonus --profile player-name [player-name]..."
     
 def parseCommandLine(argList):
     """receive input for SOS Game experiment"""
