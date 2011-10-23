@@ -180,7 +180,7 @@ def selectVOI(state, stats, voi):
 def voiHoeffding(stat, alpha, beta):
 
 	def estimate(n, over, under):
-		return over*exp(-2.0*n*under*under)/n
+		return over*exp(-0.5*n*under*under)/n
 
 	avg = stat.getAvgValue()
 	voi = avg > beta \
@@ -210,17 +210,16 @@ def bisection(f, a, b, eps):
 def voiEyal(stat, alpha, beta):
 	def estimate(n, over, under):
 		def destim(between):
-			return 4.0*over*between*exp(-2.0*n*between*between) \
-				- exp(-2.0*n*under*under)
+			return 4.0*n*over*between*exp(-0.5*n*between*between) \
+				- exp(-0.5*n*under*under)
 		between = bisection(destim, under, under+over, 0.001)
-		return (between-under)*exp(-2.0*n*under*under) \
-			+ over*exp(-2.0*n*between*between)
+	   	return ((between-under)*exp(-0.5*n*under*under) \
+					+ over*exp(-0.5*n*between*between))/n
 
 	avg = stat.getAvgValue()
-	voi = avg > beta \
+	return avg > beta \
 		and estimate(stat.count, 1+beta, avg-beta) \
 		or estimate(stat.count, 1-alpha, alpha-avg)
-	return voi
 
 def selectEyal(state, stats):
 	return selectVOI(state, stats, voiEyal)
@@ -244,6 +243,11 @@ class HCT(MCTS):
 	"Hoeffding VOI then UCT"
 	def __init__(self, game, samples):
 		MCTS.__init__(self, game, samples, selectHoeffding, selectUCB)
+
+class HRT(MCTS):
+	"Hoeffding VOI then Random"
+	def __init__(self, game, samples):
+		MCTS.__init__(self, game, samples, selectHoeffding, selectRandom)
 
 class ECT(MCTS):
 	"Hoeffding VOI with Eyal's correction, then UCT"
