@@ -7,7 +7,7 @@
 #define SG_BLACKWHITE_H
 
 #include <boost/static_assert.hpp>
-
+#include "SgSystem.h"
 //----------------------------------------------------------------------------
 
 /** Black stone, black player. */

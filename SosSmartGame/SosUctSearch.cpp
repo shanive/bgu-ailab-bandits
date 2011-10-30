@@ -7,6 +7,7 @@
 #include "SgUctTree.h"
 #include "SgUctValue.h"
 #include "SgRandom.h"
+#include "assert.h"
 
 SosUctThreadState::SosUctThreadState(unsigned int threadId, const SosGame& game, const SgBlackWhite color, const SosState state)
     : SgUctThreadState(threadId, game.size()),,
