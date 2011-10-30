@@ -8,7 +8,7 @@
 #define SOS_UCTSEARCH_H
 
 #include "SgUctSearch"
-#include "SosGame"
+#include "SosGame.h"
 #include "SgBlackWhite"
 
 class SosUctThreadState
@@ -120,6 +120,100 @@ private:
 
     // @} // name
 };
+
+
 //----------------------------------------------------------------------------
+
+class SgUctSearch;
+
+/** Create game specific thread state.
+    @see SgUctThreadState
+    @ingroup sguctgroup */
+class SosThreadStateFactory: SgUctThreadStateFactory
+{
+public:
+    /**
+    constructor.
+    @param game An Sos game.
+    @param color The color of the player.
+    @param state An SOS game state.
+    */
+    SosUctThreadStateFactory(SosGame game, SgBlackWhite color, 
+				SosState state);
+
+    /**
+    destructor.
+    */
+    ~SosUctThreadStateFactory();
+
+    /**
+    create an SosUctThreadState instance.
+    @param threadId see SosUctThreadState()
+    @param search see SosUctThreadState()
+    @return The new created instance.
+    */
+    SgUctThreadState* Create(unsigned int threadId,
+                                     const SgUctSearch& search);
+
+private:
+
+    SosGame m_game;
+
+    SosState m_state;
+
+    SgBlackWhite m_color;
+
+};
+
+//----------------------------------------------------------------------------
+
+class SosUctSearch : public SgUctSearch
+{
+
+public:
+	/**
+	constructor.
+	@param game The game.
+	@param factory .
+	*/
+	SosUctSearch(SosGame game, SgUctThreadStateFactory* factory);
+
+	~SosUctSearch();
+
+	
+	/** @name SgUctSearch pure vitual functions */
+	
+	std::string MoveString(SgMove move) const;
+
+	SgBlackWhite ToPlay() const;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif // SOS_UCTSEARCH_H

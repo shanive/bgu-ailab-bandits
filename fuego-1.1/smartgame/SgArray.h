@@ -5,7 +5,7 @@
 
 #ifndef SG_ARRAY_H
 #define SG_ARRAY_H
-
+#include "SgSystem.h"
 #include <cstring>
 
 //----------------------------------------------------------------------------

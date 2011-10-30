@@ -149,6 +149,22 @@
 		return (state.availableMoves().empty());
 	}
 
+	double SosGame::twoPlayersGame(SosPlayer firstplayer, 
+					SosPlayer secondplayer)
+	{
+		SgMove move;
+		SosState state = this->initialState();
+		for(round = 0; round < (this->m_gameSize / 2); round++)
+		{
+			move =  firstplayer.genMove(state);
+			state.play(move);
+			move = secondplayer.genmove(state);
+			state.play(move);
+		}
+		return this->gameScore(state);
+	}
+			
+
 	double SosGame::gameScore(SosState state)
 	{
 		assert(this->isFinalState(state));
@@ -169,7 +185,7 @@
 		if (diff > 0)
 			return 1;
 		else
-			return -1;
+			return 0;
 	}
 
 //SosGame private methods:
@@ -190,7 +206,12 @@
 		else //order == RANDOM
 			std::random_shuffle(this->m_switchValues.begin(), 
 					this->m_switchValues.end());
-	}			
+	}	
+
+	SosState SosGame::initialState()
+	{
+		return SosState(this->m_gameSize);
+	}	
 
 	int SosGame::moveValue(SgMove move)
 	{

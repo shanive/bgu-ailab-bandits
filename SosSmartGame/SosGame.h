@@ -5,6 +5,7 @@
 #ifndef SOS_GAME_H
 #define SOS_GAME_H
 
+#include "SosPlayer.h"
 #include <vector>
 #include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgBlackWhite.h"
 #include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgMove.h"
@@ -140,6 +141,13 @@ public:
 	bool isFinalState(SosState state);
 
 //TODO: two players game!
+	/**
+	simulate a game between two given players.
+	@param firstplayer 
+	@param seconfplayer
+	@return the score of the game.
+	*/
+	double twoPlayersGame(SosPlayer firstplayer, SosPlayer secondplayer);
 
 	/**
 	@param state A final state of this game.
@@ -156,7 +164,7 @@ public:
 	
 	/**
 	@param state A state of this game.
-	@return 1 if white has won and -1 otherwise.
+	@return 1 if white has won and 0 otherwise.
 	*/ 
 	int winLoss(SosState state);
 
@@ -173,6 +181,9 @@ private:
 
 	/* Initialize switches' values according to order */
 	void initValues(ValuesOrder order);
+
+	/* return the initial state of this game */
+	SosState initialState();
 
 	/* Return the difference between white's score and black's score */
 	int difference(SosState state);

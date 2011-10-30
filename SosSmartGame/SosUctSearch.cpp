@@ -16,26 +16,26 @@ SosUctThreadState::SosUctThreadState(unsigned int threadId, const SosGame& game,
       m_gameState(state)
 
 {
-    m_isInPlayout = false;
+    this->m_isInPlayout = false;
 }
 
 SgUctValue SosUctThreadState::Evaluate()
 {
-	SG_ASSERT(m_game.endOfGame(m_gameState));
-	return static_cast<SgUctValue>(m_game.score(m_gameState));
+	SG_ASSERT(this->m_game.isFinalState(this->m_gameState));
+	return static_cast<SgUctValue>(this->m_game.gameScore(this->m_gameState));
 }
 
 void SosUctThreadState::Execute(SgMove move)
 {
-    SG_ASSERT(! m_isInPlayout);
+    SG_ASSERT(! this->m_isInPlayout);
     SG_ASSERT(move == SG_PASS);
-    m_gameState.play(move);
+    this->m_gameState.play(move);
 }
 
 void SosUctThreadState::ExecutePlayout(SgMove move)
 {
-    SG_ASSERT(m_isInPlayout);
-    Execute(move)
+    SG_ASSERT(this->m_isInPlayout);
+    this->Execute(move)
 }
 
 bool SosUctThreadState::GenerateAllMoves(SgUctValue count, 
@@ -44,15 +44,15 @@ bool SosUctThreadState::GenerateAllMoves(SgUctValue count,
 {
     moves.clear();
 
-    if (m_game.endOfGame(m_gameState)){
-        if (((Evaluate() == 1) && (m_color == SG_WHITE)) 
-		|| ((Evaluate() == 0) && (m_color == SG_BLACK)))
+    if (this->m_game.isFinalState(this->m_gameState)){
+        if (((this->Evaluate() == 1) && (this->m_color == SG_WHITE)) 
+		|| ((this->Evaluate() == 0) && (this->m_color == SG_BLACK)))
 		provenType = SG_PROVEN_WIN;
 	else
 		provenType = SG_PROVEN_LOSS;
     }
     else{
-	std::vector<SgMove> availableMoves = m_gameState.availableMoves()
+	std::vector<SgMove> availableMoves = this->m_gameState.availableMoves();
 	std::vector<SgMove>::const_iterator it;
 	
 	for (it = availableMoves.begin(); it != availableMoves.end(); ++it){
@@ -65,7 +65,7 @@ bool SosUctThreadState::GenerateAllMoves(SgUctValue count,
 
 SgMove SosUctThreadState::GeneratePlayoutMove(bool& skipRaveUpdate)
 {
-	std::vector<SgMove> availableMoves = m_gameState.availableMoves();
+	std::vector<SgMove> availableMoves = this->m_gameState.availableMoves();
 	SgRandom randomize =  SgRandom();
 
 	index =  randomize.Int(availableMoves.size());
@@ -76,7 +76,7 @@ SgMove SosUctThreadState::GeneratePlayoutMove(bool& skipRaveUpdate)
 
 void SosUctThreadState::GameStart()
 {
-    m_isInPlayout = false;
+    this->m_isInPlayout = false;
 }
 
 void SosUctThreadState::StartPlayout()
@@ -86,7 +86,7 @@ void SosUctThreadState::StartPlayout()
 
 void SosUctThreadState::StartPlayouts()
 {
-    m_isInPlayout = true;
+    this->m_isInPlayout = true;
 }
 
 void SosUctThreadState::StartSearch()
@@ -96,10 +96,35 @@ void SosUctThreadState::StartSearch()
 
 void SosUctThreadState::TakeBackInTree(std::size_t nuMoves)
 {
-    m_gameState.undo(nuMoves);
+    this->m_gameState.undo(nuMoves);
 }
 
 void SosUctThreadState::TakeBackPlayout(std::size_t nuMoves)
 {
-    m_gameState.undo(nuMoves);
+    this->m_gameState.undo(nuMoves);
 }
+
+//----------------------------------------------------------------------------
+
+SosThreadStateFactory::SosThreadStateFactory(SosGame game, 
+					SgBlackWhite color, 
+					SosState state)
+				: m_game(game),
+				  m_color(color), 
+				  m_state(state)
+{
+}
+
+SosThreadStateFactory::~SosThreadStateFactory()
+{
+}
+
+SgUctThreadState* SosThreadStateFactory:: Create(unsigned int threadId,
+                                     		const SgUctSearch& search)
+{
+	return new SosUctThreadState(this->threadId, this->m_game, 
+					this->m_color, this->state);
+}
+
+//----------------------------------------------------------------------------
+
