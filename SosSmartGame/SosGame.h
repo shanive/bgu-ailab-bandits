@@ -94,6 +94,12 @@ public:
 	@return number of switches.
 	*/
 	int size();
+	
+	/**
+	@return the game's komi (winning value)
+	see Uct article.
+	*/
+	int komi();
 
 	/**
 	undo a given number of moves played.
@@ -143,11 +149,11 @@ public:
 //TODO: two players game!
 	/**
 	simulate a game between two given players.
-	@param firstplayer 
-	@param seconfplayer
+	@param firstplayer A pointer to SosPlayer instance.
+	@param seconfplayer A pointer to SosPlayer instance.
 	@return the score of the game.
 	*/
-	double twoPlayersGame(SosPlayer firstplayer, SosPlayer secondplayer);
+	double twoPlayersGame(SosPlayer *firstplayer, SosPlayer *secondplayer);
 
 	/**
 	@param state A final state of this game.

@@ -91,6 +91,11 @@
 		return this->m_size;
 	}
 
+	int SosGame::komi()
+	{
+		return (this.m_size / 2);
+	}
+
 	void SosState::undo(int n)
 	{
 		int nuPlayed = this->m_played.size();
@@ -149,16 +154,16 @@
 		return (state.availableMoves().empty());
 	}
 
-	double SosGame::twoPlayersGame(SosPlayer firstplayer, 
-					SosPlayer secondplayer)
+	double SosGame::twoPlayersGame(SosPlayer *firstplayer, 
+					SosPlayer *secondplayer)
 	{
 		SgMove move;
 		SosState state = this->initialState();
-		for(round = 0; round < (this->m_gameSize / 2); round++)
+		for(int round = 0; round < (this->m_gameSize / 2); round++)
 		{
-			move =  firstplayer.genMove(state);
+			move =  firstplayer->genMove(&state);
 			state.play(move);
-			move = secondplayer.genmove(state);
+			move = secondplayer->genMove(&state);
 			state.play(move);
 		}
 		return this->gameScore(state);

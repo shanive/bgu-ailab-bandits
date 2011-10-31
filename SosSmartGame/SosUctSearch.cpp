@@ -22,13 +22,12 @@ SosUctThreadState::SosUctThreadState(unsigned int threadId, const SosGame& game,
 SgUctValue SosUctThreadState::Evaluate()
 {
 	SG_ASSERT(this->m_game.isFinalState(this->m_gameState));
-	return static_cast<SgUctValue>(this->m_game.gameScore(this->m_gameState));
+	return static_cast<SgUctValue>(this->m_game.ScoreBonus(this->m_gameState));
 }
 
 void SosUctThreadState::Execute(SgMove move)
 {
     SG_ASSERT(! this->m_isInPlayout);
-    SG_ASSERT(move == SG_PASS);
     this->m_gameState.play(move);
 }
 
@@ -45,11 +44,12 @@ bool SosUctThreadState::GenerateAllMoves(SgUctValue count,
     moves.clear();
 
     if (this->m_game.isFinalState(this->m_gameState)){
-        if (((this->Evaluate() == 1) && (this->m_color == SG_WHITE)) 
-		|| ((this->Evaluate() == 0) && (this->m_color == SG_BLACK)))
+        if (((this->Evaluate() > this->m_game.komi()) && (this->m_color == SG_WHITE)) 
+		|| ((this->Evaluate() < this->m_game.komi()) && (this->m_color == SG_BLACK)))
 		provenType = SG_PROVEN_WIN;
 	else
-		provenType = SG_PROVEN_LOSS;
+		provenType = SG_PROVEN_LOSS;	
+	return true;
     }
     else{
 	std::vector<SgMove> availableMoves = this->m_gameState.availableMoves();
@@ -60,7 +60,7 @@ bool SosUctThreadState::GenerateAllMoves(SgUctValue count,
     	}
 	provenType = SG_NOT_PROVEN; 
     }
-    return false; ///Todo
+    return false; 
 }  
 
 SgMove SosUctThreadState::GeneratePlayoutMove(bool& skipRaveUpdate)

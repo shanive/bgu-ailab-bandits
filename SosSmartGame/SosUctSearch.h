@@ -7,9 +7,9 @@
 #ifndef SOS_UCTSEARCH_H
 #define SOS_UCTSEARCH_H
 
-#include "SgUctSearch"
+#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgUctSearch.h"
 #include "SosGame.h"
-#include "SgBlackWhite"
+#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgBlackWhite.h"
 
 class SosUctThreadState
 	: SgUctThreadState
@@ -20,8 +20,10 @@ public:
 	@param threadId The number of the thread. Needed for passing to
 	constructor of SgUctThreadState.
 	@param game An SOS game.
+	@param color The color of the corrent player.
+	@param state The current state of game.
     */
-    SosUctThreadState(unsigned int threadId, SosGame game);
+    SosUctThreadState(unsigned int threadId, const SosGame& game, const SgBlackWhite color, const SosState state);
 
     virtual ~SosUctThreadState();
 
@@ -31,18 +33,26 @@ public:
     /** Evaluate end-of-game position.
         Will only be called if GenerateAllMoves() or GeneratePlayoutMove()
         returns no moves. Should return larger values if position is better
-        for the player to move. */
+        for the player to move. 
+	@pre this.game.isFinalState(this.state)
+    */
     SgUctValue Evaluate();
 
     /** Execute a move.
-        @param move The move */
+        @param move The move
+	@pre move in this->state.availableMoves()
+	@post moves isn't in this->state.availableMoves()
+    */
     void Execute(SgMove move);
 
     /** Execute a move in the playout phase.
         For optimization if the subclass uses uses a different game state
         representation in the playout phase. Otherwise the function can be
         implemented in the subclass by simply calling Execute().
-        @param move The move */
+        @param move The move 
+	@pre move in this->state.availableMoves()
+	@post moves isn't in this->state.availableMoves()
+    */
     void ExecutePlayout(SgMove move);
 
     /** Generate moves.
@@ -72,7 +82,9 @@ public:
         thread-safe. */
     virtual void StartSearch();
 
-    /** Take back moves played in the in-tree phase. */
+    /** Take back moves played in the in-tree phase. 
+	@pre already played nuMoves moves.
+	@post game played moves = @pre game played moves - nuMoves */
     virtual void TakeBackInTree(std::size_t nuMoves) = 0;
 
     /** Take back moves played in the playout phase.
@@ -80,7 +92,9 @@ public:
         after this function is called. If the subclass implements the playout
         in s separate state, which is initialized in StartPlayout() and does
         not support undo, the implementation of this function can be left
-        empty in the subclass. */
+        empty in the subclass.
+	@pre already played nuMoves moves.
+	@post game played moves = @pre game played moves - nuMoves */
     virtual void TakeBackPlayout(std::size_t nuMoves) = 0;
 
     // @} // name
@@ -166,28 +180,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-
-class SosUctSearch : public SgUctSearch
-{
-
-public:
-	/**
-	constructor.
-	@param game The game.
-	@param factory .
-	*/
-	SosUctSearch(SosGame game, SgUctThreadStateFactory* factory);
-
-	~SosUctSearch();
-
-	
-	/** @name SgUctSearch pure vitual functions */
-	
-	std::string MoveString(SgMove move) const;
-
-	SgBlackWhite ToPlay() const;
-
-}
 
 
 
