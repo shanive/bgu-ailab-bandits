@@ -40,7 +40,7 @@ void SosUctThreadState::Execute(SgMove move)
 void SosUctThreadState::ExecutePlayout(SgMove move)
 {
     assert(this->m_isInPlayout);
-    this->Execute(move);
+    this->m_gameState->play(move);
 }
 
 bool SosUctThreadState::GenerateAllMoves(SgUctValue count, 
@@ -50,8 +50,9 @@ bool SosUctThreadState::GenerateAllMoves(SgUctValue count,
     moves.clear();
 
     if (this->m_game->isFinalState(*this->m_gameState)){
-        if (((this->Evaluate() > this->m_game->komi()) && (this->m_color == SG_WHITE)) 
-		|| ((this->Evaluate() < this->m_game->komi()) && (this->m_color == SG_BLACK)))
+	double scoreBonus = this->m_game->scoreBonus(*this->m_gameState);
+        if ((( scoreBonus > this->m_game->komi()) && (this->m_color == SG_WHITE)) 
+		|| ((scoreBonus < this->m_game->komi()) && (this->m_color == SG_BLACK)))
 		provenType = SG_PROVEN_WIN;
 	else
 		provenType = SG_PROVEN_LOSS;	

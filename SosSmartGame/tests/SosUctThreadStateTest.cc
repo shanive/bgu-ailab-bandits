@@ -42,6 +42,7 @@ void SosUctThreadStateTest::ExecuteTest(void)
  
 void SosUctThreadStateTest::ExecutePlayoutTest(void)
 {
+	this->threadState->StartPlayouts();
 	this->threadState->ExecutePlayout(static_cast<SgMove>(2));
 	std::vector<SgMove> whites = this->state->whiteMoves();
 	CPPUNIT_ASSERT(whites.size() == 1);
@@ -69,7 +70,7 @@ void SosUctThreadStateTest::GeneratePlayoutMoveTest(void)
 	bool rave;
 	SgMove move = this->threadState->GeneratePlayoutMove(rave);
 	std::vector<SgMove> avails = this->state->availableMoves();
-	CPPUNIT_ASSERT(find(avails.begin(), avails.end(), move) == avails.end());
+	CPPUNIT_ASSERT(find(avails.begin(), avails.end(), move) != avails.end());
 }
 
 void SosUctThreadStateTest::TakeBackInTreeTest(void)
