@@ -1,8 +1,8 @@
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/SosSmartGame/SosGame.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/SosSmartGame/SosUctSearch.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgMove.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgUctTree.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgBlackWhite.h"
+#include "../SosGame.h"
+#include "../SosUctSearch.h"
+#include "SgMove.h"
+#include "SgUctTree.h"
+#include "SgBlackWhite.h"
 #include "SosUctThreadStateTest.h"
 #include <vector>
 

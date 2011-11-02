@@ -3,10 +3,10 @@
 //----------------------------------------------------------------------------
 #include <vector>
 #include "SosUctSearch.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgBlackWhite.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgUctTree.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgUctValue.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgUctSearch.h"
+#include "SgBlackWhite.h"
+#include "SgUctTree.h"
+#include "SgUctValue.h"
+#include "SgUctSearch.h"
 #include "assert.h"
 #include "SosGame.h"
 #include <stdlib.h>

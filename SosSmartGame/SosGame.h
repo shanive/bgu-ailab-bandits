@@ -7,8 +7,8 @@
 
 #include "SosPlayer.h"
 #include <vector>
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgBlackWhite.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgMove.h"
+#include "SgBlackWhite.h"
+#include "SgMove.h"
 /** move's color. */
 typedef enum 
 {

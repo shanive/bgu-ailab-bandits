@@ -7,9 +7,9 @@
 #ifndef SOS_UCTSEARCH_H
 #define SOS_UCTSEARCH_H
 
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgUctSearch.h"
+#include "SgUctSearch.h"
 #include "SosGame.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgBlackWhite.h"
+#include "SgBlackWhite.h"
 
 class SosUctThreadState
 	: public SgUctThreadState

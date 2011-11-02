@@ -8,7 +8,7 @@ Interface of a simple SOS player.
 #ifndef SOS_PLAYER_H
 #define SOS_PLAYER_H
 
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgMove.h"
+#include "SgMove.h"
 
 class SosGame;
 class SosState;

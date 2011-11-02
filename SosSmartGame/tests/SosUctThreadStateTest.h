@@ -4,7 +4,7 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/SosSmartGame/SosUctSearch.h"
+#include "../SosUctSearch.h"
 
 using namespace std;
 

@@ -2,10 +2,10 @@
 
 #include "SosGameTest.h"
 #include <vector>
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgMove.h"
+#include "SgMove.h"
 #include <algorithm>
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/SosSmartGame/SosGame.h"
-#include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/SosSmartGame/SosPlayer.h"
+#include "../SosGame.h"
+#include "../SosPlayer.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION (SosStateTest);
 
