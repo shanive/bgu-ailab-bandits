@@ -6,10 +6,10 @@ uses smartgame library.
 
 #include "SosPlayer.h"
 #include "SosUctSearch.h"
-
+#include "SgMove.h"
 class SosGame;
 class SosState;
-class SgMove;
+
 
 class SosUctPlayer
 	: public SosPlayer
@@ -35,6 +35,6 @@ public:
 private:
 	SosGame *m_game;
 	
-	SosUctSearch *m_search;
+	SgUctSearch *m_search;
 };
 

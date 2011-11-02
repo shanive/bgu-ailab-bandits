@@ -10,7 +10,7 @@ BOOST_THREAD_LIB = -lboost_thread-mt
 BOOST_UNIT_TEST_FRAMEWORK_LIB = -lboost_unit_test_framework-mt
 
 SOS_SMARTGAME_TEST=tests
-SOS_OBJECTS=${SOS_SMARTGAME_TEST}/ftest.o ${SOS_SMARTGAME_TEST}/SosUctThreadStateTest.o SosUctSearch.o ${SOS_SMARTGAME_TEST}/SosGameTest.o SosGame.o SosPlayer.o
+SOS_OBJECTS=${SOS_SMARTGAME_TEST}/ftest.o ${SOS_SMARTGAME_TEST}/SosUctThreadStateTest.o SosUctSearch.o ${SOS_SMARTGAME_TEST}/SosUctPlayerTest.o ${SOS_SMARTGAME_TEST}/SosGameTest.o SosGame.o SosPlayer.o SosUctPlayer.o
 CFLAGS=-I../fuego-1.1/smartgame $(BOOST_CPPFLAGS) -O -g
 LIBS=\
 ../fuego-1.1/smartgame/libfuego_smartgame.a \
@@ -33,7 +33,11 @@ SosGame.o: SosGame.cpp SosPlayer.h SosGame.h
 
 SosPlayer.o: SosPlayer.cpp SosPlayer.h
 
+SosUctPlayer.o: SosUctPlayer.cpp SosUctPlayer.h
+
 SosUctSearch.o: SosUctSearch.cpp SosUctSearch.h
+
+${SOS_SMARTGAME_TEST}/SosUctPlayerTest.o: ${SOS_SMARTGAME_TEST}/SosUctPlayerTest.cpp ${SOS_SMARTGAME_TEST}/SosUctPlayerTest.h 
 
 ${SOS_SMARTGAME_TEST}/SosGameTest.o: ${SOS_SMARTGAME_TEST}/SosGameTest.cc ${SOS_SMARTGAME_TEST}/SosGameTest.h
 

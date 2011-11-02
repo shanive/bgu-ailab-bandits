@@ -180,6 +180,9 @@ private:
 
 //----------------------------------------------------------------------------
 
+class SosUctSearch : public SgUctSearch
+{
+}
 
 #endif // SOS_UCTSEARCH_H
 

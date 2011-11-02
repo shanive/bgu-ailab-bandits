@@ -12,6 +12,7 @@ UCT based SOS player.
 #include "SgUctTree.h"
 #include "SgUctValue.h"
 #include "SgMove.h"
+
 SosUctPlayer::SosUctPlayer(SosGame *game)
 		: m_game(game)
 {
