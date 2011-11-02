@@ -12,7 +12,7 @@
 #include "/users/studs/bsc/2011/shanive/freespace/bgu-ailab-bandits/fuego-1.1/smartgame/SgBlackWhite.h"
 
 class SosUctThreadState
-	: SgUctThreadState
+	: public SgUctThreadState
 {
 public:
    
@@ -23,7 +23,7 @@ public:
 	@param color The color of the corrent player.
 	@param state The current state of game.
     */
-    SosUctThreadState(unsigned int threadId, const SosGame& game, const SgBlackWhite color, const SosState state);
+    SosUctThreadState(unsigned int threadId, SgBlackWhite color, SosGame* game, SosState *state);
 
     virtual ~SosUctThreadState();
 
@@ -72,7 +72,6 @@ public:
         move should be excluded from RAVE updates. Otherwise it can be
         ignored.
         @return The move or SG_NULLMOVE at the end of the game. */
-	//select next - changes at each agent
     virtual SgMove GeneratePlayoutMove(bool& skipRaveUpdate);
 
     /** Start search.
@@ -85,7 +84,7 @@ public:
     /** Take back moves played in the in-tree phase. 
 	@pre already played nuMoves moves.
 	@post game played moves = @pre game played moves - nuMoves */
-    virtual void TakeBackInTree(std::size_t nuMoves) = 0;
+    virtual void TakeBackInTree(std::size_t nuMoves);
 
     /** Take back moves played in the playout phase.
         The search engine does not assume that the moves are really taken back
@@ -95,42 +94,42 @@ public:
         empty in the subclass.
 	@pre already played nuMoves moves.
 	@post game played moves = @pre game played moves - nuMoves */
-    virtual void TakeBackPlayout(std::size_t nuMoves) = 0;
+    virtual void TakeBackPlayout(std::size_t nuMoves);
 
     // @} // name
 
-
-    /** @name Virtual functions */
-    // @{
-
+// 
+//     /** @name Virtual functions */
+//     // @{
+// 
     /** Function that will be called by PlayGame() before the game.
         Default implementation does nothing. */
     virtual void GameStart();
-
+// 
     /** Function that will be called at the beginning of the playout phase.
         Will be called only once (not once per playout!). Can be used for
         example to save some state of the current position for more efficient
         implementation of TakeBackPlayout().
         Default implementation does nothing. */
     virtual void StartPlayouts();
-
-    /** Function that will be called at the beginning of each playout.
-        Default implementation does nothing. */
-    virtual void StartPlayout();
-
-    /** Function that will be called after each playout.
-        Default implementation does nothing. */
-    virtual void EndPlayout();
-
+// 
+//     /** Function that will be called at the beginning of each playout.
+//         Default implementation does nothing. */
+//     virtual void StartPlayout();
+// 
+//     /** Function that will be called after each playout.
+//         Default implementation does nothing. */
+//     virtual void EndPlayout();
+// */
 private:
 	
 	bool m_isInPlayout;
 
-	SosGame m_game;
+	SosGame *m_game;
 	/*the color of the current player*/ 
 	SgBlackWhite m_color;
 
-	SosState m_gameState;
+	SosState *m_gameState;
 
     // @} // name
 };
@@ -143,7 +142,7 @@ class SgUctSearch;
 /** Create game specific thread state.
     @see SgUctThreadState
     @ingroup sguctgroup */
-class SosThreadStateFactory: SgUctThreadStateFactory
+class SosUctThreadStateFactory: public SgUctThreadStateFactory
 {
 public:
     /**
@@ -152,8 +151,8 @@ public:
     @param color The color of the player.
     @param state An SOS game state.
     */
-    SosUctThreadStateFactory(SosGame game, SgBlackWhite color, 
-				SosState state);
+    SosUctThreadStateFactory(SosGame *game, SgBlackWhite color, 
+				SosState *state);
 
     /**
     destructor.
@@ -171,9 +170,9 @@ public:
 
 private:
 
-    SosGame m_game;
+    SosGame* m_game;
 
-    SosState m_state;
+    SosState* m_state;
 
     SgBlackWhite m_color;
 
@@ -182,30 +181,5 @@ private:
 //----------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #endif // SOS_UCTSEARCH_H
+

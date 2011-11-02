@@ -94,12 +94,6 @@ public:
 	@return number of switches.
 	*/
 	int size();
-	
-	/**
-	@return the game's komi (winning value)
-	see Uct article.
-	*/
-	int komi();
 
 	/**
 	undo a given number of moves played.
@@ -146,7 +140,6 @@ public:
 	*/	
 	bool isFinalState(SosState state);
 
-//TODO: two players game!
 	/**
 	simulate a game between two given players.
 	@param firstplayer A pointer to SosPlayer instance.
@@ -173,6 +166,12 @@ public:
 	@return 1 if white has won and 0 otherwise.
 	*/ 
 	int winLoss(SosState state);
+
+	/**
+	@return the game's komi (winning value)
+	see Uct article.
+	*/
+	int komi();
 
 private:
 

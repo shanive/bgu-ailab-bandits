@@ -91,10 +91,6 @@
 		return this->m_size;
 	}
 
-	int SosGame::komi()
-	{
-		return (this.m_size / 2);
-	}
 
 	void SosState::undo(int n)
 	{
@@ -124,6 +120,8 @@
 		return moves;
 	}
  
+//----------------------------------------------------------------------------------------------------
+//SosGame implementation
 
 	SosGame::SosGame(int size, bool scoreBonus /*= false */, 
 		ValuesOrder order /*= RANDOM */,
@@ -167,6 +165,11 @@
 			state.play(move);
 		}
 		return this->gameScore(state);
+	}
+
+	int SosGame::komi()
+	{
+		return (this->m_gameSize / 2);
 	}
 			
 
