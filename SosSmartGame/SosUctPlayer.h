@@ -34,7 +34,5 @@ public:
 
 private:
 	SosGame *m_game;
-	
-	SgUctSearch *m_search;
 };
 

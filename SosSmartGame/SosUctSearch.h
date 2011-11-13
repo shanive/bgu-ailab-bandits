@@ -182,7 +182,36 @@ private:
 
 class SosUctSearch : public SgUctSearch
 {
-}
+ public:
+  /**
+     constructor.
+     @param threadStateFactory Specific Thread State Creator.
+     @param moveRange move range of Sos Game.
+  */
+  SosUctSearch(SosUctThreadStateFactory *threadStateFactory, int moveRange);
+
+  /**
+     destructor.
+  */
+  virtual ~SosUctSearch();
+
+  /** @SgUctSearch Pure Virtual functions */
+  
+  /**
+     Convert move to string.
+     needs To be thread State.
+  */
+  std::string MoveString(SgMove move) const;
+
+  /**
+     Evaluate value to use if evaluation is unknown.
+     Will be used if games are aborted because they exceed
+     the maximum game length.
+     Needs to be thread safe.
+  */
+  SgUctValue UnknownEval() const;
+  
+};
 
 #endif // SOS_UCTSEARCH_H
 

@@ -60,9 +60,9 @@ void SosUctThreadStateTest::GenerateAllMovesTest(void)
 	this->state->play(static_cast<SgMove>(1));//black's move
 	this->state->play(static_cast<SgMove>(3));//white's move
 	this->state->play(static_cast<SgMove>(0));//black's move
-	CPPUNIT_ASSERT(this->threadState->GenerateAllMoves(0, moves, provenType));
+	CPPUNIT_ASSERT(!this->threadState->GenerateAllMoves(0, moves, provenType));
 	CPPUNIT_ASSERT(moves.size() == 0);
-	CPPUNIT_ASSERT(provenType == SG_PROVEN_WIN);
+	CPPUNIT_ASSERT(provenType == SG_NOT_PROVEN);
 }
 
 void SosUctThreadStateTest::GeneratePlayoutMoveTest(void)
