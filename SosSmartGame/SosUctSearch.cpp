@@ -2,6 +2,7 @@
 /** @file SosUctSearch.cpp */
 //----------------------------------------------------------------------------
 #include <vector>
+#include <string>
 #include "SosUctSearch.h"
 #include "SgBlackWhite.h"
 #include "SgUctTree.h"
@@ -135,13 +136,16 @@ SosUctThreadStateFactory::SosUctThreadStateFactory(SosGame *game,
 
 SosUctThreadStateFactory::~SosUctThreadStateFactory()
 {
+
 }
 
 SgUctThreadState* SosUctThreadStateFactory:: Create(unsigned int threadId,
                                      		const SgUctSearch& search)
 {
-	return new SosUctThreadState(threadId, this->m_color, this->m_game, 
-					 this->m_state);
+	return new SosUctThreadState(threadId, this->m_color,
+                                                          this->m_game, 
+                                                          this->m_state);
+
 }
 
 //----------------------------------------------------------------------------
@@ -149,6 +153,7 @@ SgUctThreadState* SosUctThreadStateFactory:: Create(unsigned int threadId,
 SosUctSearch::SosUctSearch(SosUctThreadStateFactory *threadStateFactory, 
 			   int moveRange): SgUctSearch(threadStateFactory, moveRange)
 {
+  
 }
 
 SosUctSearch::~SosUctSearch()

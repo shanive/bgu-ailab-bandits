@@ -10,6 +10,10 @@
 #include "SgUctSearch.h"
 #include "SosGame.h"
 #include "SgBlackWhite.h"
+#include <string>
+#include <vector>
+
+using namespace std;
 
 class SosUctThreadState
 	: public SgUctThreadState

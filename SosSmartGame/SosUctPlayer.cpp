@@ -39,12 +39,15 @@ SgMove SosUctPlayer::genMove(SosState *state)
   else
     color = SG_BLACK;
 	
-  SosUctThreadStateFactory factory(this->m_game, color, state);
-  SosUctSearch search(&factory, state->size());
+  SosUctThreadStateFactory *factory = new SosUctThreadStateFactory(this->m_game, color, state);
+  SosUctSearch *search = new SosUctSearch(factory, state->size());
   //setings of this->m_search
   cout<< "Player Start searching"<< endl;
-  search.Search(maxGames, maxTime, sequence);
+  search->Search(maxGames, maxTime, sequence);
   nextMove = sequence.at(0);
+  delete search;
+  // SosUctSearch deletes factory using smart pointers!
+  //do no delete factory!
   SgDebug()<<"end genMove"<<endl;
   SgDebug()<<"After delete search"<<endl;
   SgDebug().flush();
