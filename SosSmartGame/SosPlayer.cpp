@@ -17,7 +17,7 @@ SgMove SosRandomPlayer::genMove(SosState *state)
 {
 	std::vector<SgMove> availableMoves = state->availableMoves();
 
-	int index =  rand() % (availableMoves.size()) + 1;
+	int index =  rand() % availableMoves.size();
 
 	return availableMoves.at(index);
 }

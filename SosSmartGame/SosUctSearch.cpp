@@ -55,16 +55,6 @@ bool SosUctThreadState::GenerateAllMoves(SgUctValue count,
 {
     moves.clear();
     provenType = SG_NOT_PROVEN;
-    // if (this->m_game->isFinalState(*this->m_gameState)){
-    //     double scoreBonus = this->m_game->scoreBonus(*this->m_gameState);
-    //     if ((( scoreBonus > this->m_game->komi()) && (this->m_color == SG_WHITE)) 
-    //     	|| ((scoreBonus < this->m_game->komi()) && (this->m_color == SG_BLACK)))
-    //     	provenType = SG_PROVEN_WIN;
-    //     else
-    //     	provenType = SG_PROVEN_LOSS;	
-    //     return true;
-    // }
-    
     std::vector<SgMove> availableMoves = this->m_gameState->availableMoves();
     if (availableMoves.size()!=0){
       std::vector<SgMove>::const_iterator it;
@@ -82,12 +72,12 @@ SgMove SosUctThreadState::GeneratePlayoutMove(bool& skipRaveUpdate)
         if (this->m_game->isFinalState(*this->m_gameState))
             return SG_NULLMOVE;
 
-        SgDebug()<<"not end of game"<<endl;
+        //SgDebug()<<"not end of game"<<endl;
 	std::vector<SgMove> availableMoves = this->m_gameState->availableMoves();
        
 	int index =  rand() % availableMoves.size();
         assert(index < availableMoves.size());
-        SgDebug()<<"move num:"<<index<<endl;
+        //SgDebug()<<"move num:"<<index<<endl;
 	skipRaveUpdate = false;
 	return availableMoves.at(index);
 }
@@ -105,7 +95,7 @@ void SosUctThreadState::GameStart()
 void SosUctThreadState::StartPlayouts()
 {
     this->m_isInPlayout = true;
-    SgDebug()<<"leaving State::StartPlayouts"<<endl;
+    //SgDebug()<<"leaving State::StartPlayouts"<<endl;
 }
 
 void SosUctThreadState::StartSearch()

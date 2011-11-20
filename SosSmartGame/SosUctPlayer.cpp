@@ -15,6 +15,7 @@ UCT based SOS player.
 #include "SgUctValue.h"
 #include "SgMove.h"
 #include "SgDebug.h"
+#include "SgBlackWhite.h"
 using namespace std;
 SosUctPlayer::SosUctPlayer(SosGame *game)
 		: m_game(game)
@@ -27,7 +28,7 @@ SosUctPlayer::~SosUctPlayer()
 
 SgMove SosUctPlayer::genMove(SosState *state)
 {
-  cout<< "In SosUctPlayer::genMove"<< endl;
+  //cout<< "In SosUctPlayer::genMove"<< endl;
   SgMove nextMove;
   vector<SgMove> sequence; 
   SgBlackWhite color;
@@ -39,17 +40,18 @@ SgMove SosUctPlayer::genMove(SosState *state)
   else
     color = SG_BLACK;
 	
-  SosUctThreadStateFactory *factory = new SosUctThreadStateFactory(this->m_game, color, state);
+  SosUctThreadStateFactory *factory = 
+    new SosUctThreadStateFactory(this->m_game, color, state);
   SosUctSearch *search = new SosUctSearch(factory, state->size());
   //setings of this->m_search
-  cout<< "Player Start searching"<< endl;
+  //cout<< "Player Start searching"<< endl;
   search->Search(maxGames, maxTime, sequence);
   nextMove = sequence.at(0);
   delete search;
   // SosUctSearch deletes factory using smart pointers!
   //do no delete factory!
-  SgDebug()<<"end genMove"<<endl;
-  SgDebug()<<"After delete search"<<endl;
+  //SgDebug()<<"end genMove"<<endl;
+  //SgDebug()<<"After delete search"<<endl;
   SgDebug().flush();
   return nextMove;
       

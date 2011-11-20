@@ -10,7 +10,8 @@ BOOST_THREAD_LIB = -lboost_thread-mt
 BOOST_UNIT_TEST_FRAMEWORK_LIB = -lboost_unit_test_framework-mt
 
 SOS_SMARTGAME_TEST=tests
-SOS_OBJECTS=${SOS_SMARTGAME_TEST}/ftest.o ${SOS_SMARTGAME_TEST}/SosUctThreadStateTest.o SosUctSearch.o ${SOS_SMARTGAME_TEST}/SosUctPlayerTest.o ${SOS_SMARTGAME_TEST}/SosGameTest.o SosGame.o SosPlayer.o SosUctPlayer.o
+FTEST_OBJECTS=${SOS_SMARTGAME_TEST}/ftest.o ${SOS_SMARTGAME_TEST}/SosUctThreadStateTest.o SosUctSearch.o ${SOS_SMARTGAME_TEST}/SosUctPlayerTest.o ${SOS_SMARTGAME_TEST}/SosGameTest.o SosGame.o SosPlayer.o SosUctPlayer.o
+TOUR_OBJECTS=SosSgTournament.o SosGame.o SosPlayer.o SosUctPlayer.o SosUctSearch.o
 CFLAGS=-I../fuego-1.1/smartgame $(BOOST_CPPFLAGS) -O -g
 LIBS=\
 ../fuego-1.1/smartgame/libfuego_smartgame.a \
@@ -26,8 +27,10 @@ $(BOOST_THREAD_LIB)
 %.o: %.cc
 	g++ -c $(CFLAGS) -o $@ $<
 
-ftest:  ${SOS_OBJECTS}
-	gcc -o ftest ${SOS_OBJECTS} $(LIBS) -L${CPPUNIT_PATH}/lib -lstdc++ -lcppunit -ldl 
+ftest:  ${FTEST_OBJECTS}
+	gcc -o ftest ${FTEST_OBJECTS} $(LIBS) -L${CPPUNIT_PATH}/lib -lstdc++ -lcppunit -ldl 
+tour: ${TOUR_OBJECTS}
+	gcc -o tour ${TOUR_OBJECTS} $(LIBS) -lstdc++ -ldl 
 
 SosGame.o: SosGame.cpp SosPlayer.h SosGame.h
 
@@ -45,6 +48,10 @@ ${SOS_SMARTGAME_TEST}/SosUctThreadStateTest.o: ${SOS_SMARTGAME_TEST}/SosUctThrea
 
 ${SOS_SMARTAME_TEST}/ftest.o: ${SOS_SMARTGAME_TEST}/ftest.cc
 
-clean:
+SosSgTournament.o: SosSgTournament.cpp
+
+clean_ftest:
 	rm -f *.o ftest
 
+clean_tour:
+	rm -f *.o tour
