@@ -17,9 +17,9 @@ class SosUctPlayer
 public:
 	/**
 	constructor.
-	@param game
+	@param game SOS game.
 	*/
-	SosUctPlayer(SosGame *game);
+  SosUctPlayer(SosGame *game);
 
 	/**
 	destructor

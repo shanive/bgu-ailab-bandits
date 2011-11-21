@@ -18,7 +18,7 @@ UCT based SOS player.
 #include "SgBlackWhite.h"
 using namespace std;
 SosUctPlayer::SosUctPlayer(SosGame *game)
-		: m_game(game)
+  : m_game(game)
 {
 }
 
@@ -52,7 +52,7 @@ SgMove SosUctPlayer::genMove(SosState *state)
   //do no delete factory!
   //SgDebug()<<"end genMove"<<endl;
   //SgDebug()<<"After delete search"<<endl;
-  SgDebug().flush();
+  //SgDebug().flush();
   return nextMove;
       
 }

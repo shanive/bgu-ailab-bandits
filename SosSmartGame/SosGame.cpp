@@ -2,6 +2,9 @@
 #include <numeric> // for accumulate
 #include <assert.h>
 #include <algorithm> // for shuffle
+#include <iostream>
+#include <fstream>
+using namespace std;
 /**
 	constructor.
 	@param size Number of switches.
@@ -155,13 +158,17 @@
 	double SosGame::twoPlayersGame(SosPlayer *firstplayer, 
 					SosPlayer *secondplayer)
 	{
+          ofstream debuger;
+          debuger.open("debuger.txt",ios::trunc);
 		SgMove move;
 		SosState state = this->initialState();
 		for(int round = 0; round < (this->m_gameSize / 2); round++)
 		{
 			move =  firstplayer->genMove(&state);
+                        debuger << "first player's move: " << move << endl;
 			state.play(move);
 			move = secondplayer->genMove(&state);
+                        debuger << "second player's move: " << move << endl;
 			state.play(move);
 		}
 		return this->gameScore(state);

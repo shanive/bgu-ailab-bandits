@@ -33,11 +33,12 @@ struct Conf {
   int repeat;
   int scorebonus;
   SosGame::ValuesOrder order;
+  int samples;
   int profile;
   string outputfilename;
 
   Conf(): size(10), repeat(1000), scorebonus(0), order(SosGame::RANDOM), 
-          profile(0), outputfilename("tour.txt")
+          profile(0), outputfilename("tour.txt"), samples(1000)
   {
   }
 
@@ -47,6 +48,7 @@ struct Conf {
       "\nrepetitions: " << this->repeat <<
       "\nscorebonus: " << this->scorebonus <<
       "\norder: " << this->order <<
+      "\nsamples per state: " << this->samples <<
       "\nprofile: " << this->profile << 
       "\noutput file: " << this->outputfilename << endl; 
     cout << "players:" << endl;
@@ -58,7 +60,7 @@ struct Conf {
 };
 
 void usage(){
-  cout << "Usage: /.SosSgTournament.cpp --size <number> --repeat <number> --order <0/1/2> --scorebonus --profile --output file-name player-name [player-name]..." << endl;
+  cout << "Usage: /.SosSgTournament.cpp --size <number> --repeat <number> --order <0/1/2> --samples number --scorebonus --profile --output file-name player-name [player-name]..." << endl;
   exit(2);
 }
 
@@ -170,6 +172,7 @@ int main(int argc, char *argv[])
   {"repeat", required_argument, 0, 'r'},
   {"scorebonus", no_argument, &conf->scorebonus, 1},
   {"order", required_argument, 0, 'o'},
+  {"samples", required_argument, 0, 'n'},
   {"profile", no_argument, &conf->profile, 1},
   {"output", required_argument, 0, 'f'},
   {0, 0, 0, 0}
@@ -202,6 +205,9 @@ int main(int argc, char *argv[])
           usage();
         break;
         }
+      case 'n':
+        conf->samples = atoi(optarg);
+        break;
       case 'f':
         conf->outputfilename = optarg;
         break;
