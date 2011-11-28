@@ -7,6 +7,7 @@ uses smartgame library.
 #include "SosPlayer.h"
 #include "SosUctSearch.h"
 #include "SgMove.h"
+#include "SgUctValue.h"
 class SosGame;
 class SosState;
 
@@ -18,8 +19,9 @@ public:
 	/**
 	constructor.
 	@param game SOS game.
+        @maxGames Number Of games Per State.
 	*/
-  SosUctPlayer(SosGame *game);
+  SosUctPlayer(SosGame *game , SgUctValue maxGames );
 
 	/**
 	destructor
@@ -34,5 +36,6 @@ public:
 
 private:
 	SosGame *m_game;
+        SgUctValue m_maxGames;
 };
 

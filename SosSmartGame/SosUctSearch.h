@@ -191,8 +191,20 @@ class SosUctSearch : public SgUctSearch
      constructor.
      @param threadStateFactory Specific Thread State Creator.
      @param moveRange move range of Sos Game.
+     @param provenWinRate The lower bound value of a proven win path in the 
+     search tree. If A certain final state's value grater than 
+     provenWinRate, then all the nodes in the path lead to it are set to 
+     provenWin. Added to SgUctSearch by David & Vered in order to continue 
+     the search until reaching maxGames.
+     @param provenLossRate The upper bound value of a proven loss path in 
+     the search tree. If A certain final state's value lower than 
+     provenLossRate, then all the nodes in the path lead to it are set to 
+     provenLoss. Added to SgUctSearch by David & Vered in order to continue 
+     the search until reaching maxGames.
   */
-  SosUctSearch(SosUctThreadStateFactory *threadStateFactory, int moveRange);
+  SosUctSearch(SosUctThreadStateFactory *threadStateFactory, int moveRange,
+               SgUctValue provenWinRate = static_cast<SgUctValue>(1), 
+               SgUctValue provenLossRate = static_cast<SgUctValue>(0));
 
   /**
      destructor.

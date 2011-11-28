@@ -250,8 +250,11 @@ void SgUctSearchStat::Write(std::ostream& out) const
 //----------------------------------------------------------------------------
 
 SgUctSearch::SgUctSearch(SgUctThreadStateFactory* threadStateFactory,
-                         int moveRange)
+                         int moveRange, SgUctValue provenWinRate,
+                         SgUctValue provenLossRate)
     : m_threadStateFactory(threadStateFactory),
+      m_provenWinRate(provenWinRate),
+      m_provenLossRate(provenLossRate),
       m_logGames(false),
       m_rave(false),
       m_knowledgeThreshold(),
@@ -476,8 +479,10 @@ const SgUctNode*
 SgUctSearch::FindBestChild(const SgUctNode& node,
                            const vector<SgMove>* excludeMoves) const
 {
-    if (! node.HasChildren())
+  if (! node.HasChildren()){
+    //SgDebug() << "Has No Children" << endl;
         return 0;
+  }
     const SgUctNode* bestChild = 0;
     SgUctValue bestValue = 0;
     for (SgUctChildIterator it(m_tree, node); it; ++it)
@@ -533,15 +538,17 @@ SgUctSearch::FindBestChild(const SgUctNode& node,
 }
 
 void SgUctSearch::FindBestSequence(vector<SgMove>& sequence) const
-{
+{ 
     sequence.clear();
     const SgUctNode* current = &m_tree.Root();
     while (true)
     {
       //SgDebug()<<"finding best child"<<endl;
+      //SgDebug()<<(current == 0)<<endl;
         current = FindBestChild(*current);
         if (current == 0)
             break;
+        //SgDebug()<<"pushing best child"<< endl;
         sequence.push_back(current->Move());
         if (! current->HasChildren())
             break;
@@ -852,9 +859,9 @@ void SgUctSearch::PlayGame(SgUctThreadState& state, GlobalLock* lock)
     {
         const SgUctNode& terminalNode = *info.m_nodes.back();
         SgUctValue eval = state.Evaluate();
-        if (eval > 0.6) 
+        if (eval > m_provenWinRate) 
             m_tree.SetProvenType(terminalNode, SG_PROVEN_WIN);
-        else if (eval < 0.6)
+        else if (eval < m_provenLossRate)
             m_tree.SetProvenType(terminalNode, SG_PROVEN_LOSS);
         PropagateProvenStatus(info.m_nodes);
     }

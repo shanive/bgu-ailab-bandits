@@ -478,9 +478,22 @@ public:
         need to store data in arrays using the move as an index for
         efficient implementation. If the game does not use a small integer
         range for its move representation, this parameter should be 0.
-        Then, enhancements that require a small move range cannot be enabled. */
+        Then, enhancements that require a small move range cannot be enabled.
+        @param provenWinRate The lower bound value of a proven win path in the 
+        search tree. If A certain final state's value grater than 
+        provenWinRate, then all the nodes in the path lead to it are set to 
+        provenWin. Added by David & Vered in order to continue the 
+        search until reaching maxGames (See SgUctSearch::Search).
+        @param provenLossRate The upper bound value of a proven loss path in 
+        the search tree. If A certain final state's value lower than 
+        provenLossRate, then all the nodes in the path lead to it are set to 
+        provenLoss. Added by David & Vered in order to continue the 
+        search until reaching maxGames (See SgUctSearch::Search).
+    */
     SgUctSearch(SgUctThreadStateFactory* threadStateFactory,
-                int moveRange = 0);
+                int moveRange = 0, 
+                SgUctValue provenWinRate = static_cast<SgUctValue>(1), 
+                SgUctValue provenLossRate = static_cast<SgUctValue>(0));
 
     virtual ~SgUctSearch();
 
@@ -645,6 +658,26 @@ public:
 
     /** @name Parameters */
     // @{
+    
+    /** The lower bound value of a proven win path in the  search tree. 
+        If A certain final state's value is grater than provenWinRate, 
+        then all the nodes in the path lead to it are set to provenWin. 
+        Added by David & Vered in order to continue the search 
+        until reaching maxGames(see SgUctSearch::Search) */
+    SgUctValue ProvenWinRate() const;
+    
+    /** See ProvenLossRate() */
+    void SetProvenWinRate(SgUctValue rate);
+
+    /** The upper bound value of a proven loss path in the search tree. 
+        If A certain final state's value lower than provenLossRate, 
+        then all the nodes in the path lead to it are set to provenLoss. 
+        Added by David & Vered in order to continue the search 
+        until reaching maxGames(see SgUctSearch::Search) */
+    SgUctValue ProvenLossRate() const;
+
+    /** See ProvenLossRate() */
+    void SetProvenLossRate(SgUctValue rate);
 
     /** Constant c in the bias term.
         This constant corresponds to 2 C_p in the original UCT paper.
@@ -919,6 +952,12 @@ private:
     };
 
     std::auto_ptr<SgUctThreadStateFactory> m_threadStateFactory;
+    
+    /** See ProvenWinRate() */
+    SgUctValue m_provenWinRate;
+
+    /** See ProvenLossRate() */
+    SgUctValue m_provenLossRate;
 
     /** See LogGames() */
     bool m_logGames;
@@ -1127,6 +1166,16 @@ private:
     void UpdateTree(const SgUctGameInfo& info);
 };
 
+inline SgUctValue SgUctSearch::ProvenWinRate() const
+{
+  return m_provenWinRate;
+}
+
+inline SgUctValue SgUctSearch::ProvenLossRate() const
+{
+  return m_provenLossRate;
+}
+
 inline float SgUctSearch::BiasTermConstant() const
 {
     return m_biasTermConstant;
@@ -1230,6 +1279,16 @@ inline float SgUctSearch::RaveWeightInitial() const
 inline float SgUctSearch::RaveWeightFinal() const
 {
     return m_raveWeightFinal;
+}
+
+inline void SgUctSearch::SetProvenWinRate(SgUctValue rate)
+{
+  m_provenWinRate = rate;
+}
+
+inline void SgUctSearch::SetProvenLossRate(SgUctValue rate)
+{
+  m_provenLossRate = rate;
 }
 
 inline void SgUctSearch::SetBiasTermConstant(float biasTermConstant)

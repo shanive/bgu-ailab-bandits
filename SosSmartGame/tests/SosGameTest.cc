@@ -89,7 +89,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION (SosGameTest);
 
 void SosGameTest::setUp(void)
 {
-	this->game = new SosGame(4, false, ASCENDING);
+        this->game = new SosGame(4, false, SosGame::ASCENDING);
 	this->state = new SosState(4);
 }
 

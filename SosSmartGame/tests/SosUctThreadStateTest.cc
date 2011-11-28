@@ -10,7 +10,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION (SosUctThreadStateTest);
 
 void SosUctThreadStateTest::setUp(void)
 {
-	this->game = new SosGame(4, false, ASCENDING);
+        this->game = new SosGame(4, false, SosGame::ASCENDING);
 	this->state = new SosState(4);
 	this->threadState = new SosUctThreadState(0, SG_WHITE, this->game, this->state); 
 }

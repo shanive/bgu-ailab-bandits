@@ -141,7 +141,9 @@ SgUctThreadState* SosUctThreadStateFactory:: Create(unsigned int threadId,
 //----------------------------------------------------------------------------
 
 SosUctSearch::SosUctSearch(SosUctThreadStateFactory *threadStateFactory, 
-			   int moveRange): SgUctSearch(threadStateFactory, moveRange)
+			   int moveRange, SgUctValue provenWinRate,
+                           SgUctValue provenLossRate)
+  : SgUctSearch(threadStateFactory, moveRange, provenWinRate, provenLossRate)
 {
   
 }

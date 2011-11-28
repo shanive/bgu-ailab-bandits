@@ -17,8 +17,9 @@ UCT based SOS player.
 #include "SgDebug.h"
 #include "SgBlackWhite.h"
 using namespace std;
-SosUctPlayer::SosUctPlayer(SosGame *game)
-  : m_game(game)
+
+SosUctPlayer::SosUctPlayer(SosGame *game, SgUctValue maxGames)
+  : m_game(game), m_maxGames(maxGames)
 {
 }
 
@@ -28,13 +29,10 @@ SosUctPlayer::~SosUctPlayer()
 
 SgMove SosUctPlayer::genMove(SosState *state)
 {
-  //cout<< "In SosUctPlayer::genMove"<< endl;
   SgMove nextMove;
-  vector<SgMove> sequence; 
+  vector<SgMove> *sequence = new vector<SgMove>(); 
   SgBlackWhite color;
   double maxTime = numeric_limits<double>::max();
-  SgUctValue maxGames = static_cast<SgUctValue>(maxTime);
-	
   if (state->isWhiteTurn())
     color = SG_WHITE;
   else
@@ -43,16 +41,17 @@ SgMove SosUctPlayer::genMove(SosState *state)
   SosUctThreadStateFactory *factory = 
     new SosUctThreadStateFactory(this->m_game, color, state);
   SosUctSearch *search = new SosUctSearch(factory, state->size());
-  //setings of this->m_search
-  //cout<< "Player Start searching"<< endl;
-  search->Search(maxGames, maxTime, sequence);
-  nextMove = sequence.at(0);
+  search->Search(this->m_maxGames, maxTime,*sequence);
+  if (sequence->empty()){
+    SgDebug() << "Empty Sequence" << endl;
+    exit(1);
+  }
+  nextMove = sequence->at(0);
   delete search;
-  // SosUctSearch deletes factory using smart pointers!
+  delete sequence;
+  //SosUctSearch deletes factory using smart pointers!
   //do no delete factory!
-  //SgDebug()<<"end genMove"<<endl;
-  //SgDebug()<<"After delete search"<<endl;
-  //SgDebug().flush();
+  SgDebug().flush();
   return nextMove;
       
 }
