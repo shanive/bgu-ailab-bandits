@@ -492,8 +492,8 @@ public:
     */
     SgUctSearch(SgUctThreadStateFactory* threadStateFactory,
                 int moveRange = 0, 
-                SgUctValue provenWinRate = static_cast<SgUctValue>(1), 
-                SgUctValue provenLossRate = static_cast<SgUctValue>(0));
+                SgUctValue provenWinRate = static_cast<SgUctValue>(0.6), 
+                SgUctValue provenLossRate = static_cast<SgUctValue>(0.6));
 
     virtual ~SgUctSearch();
 
