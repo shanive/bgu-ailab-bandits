@@ -33,23 +33,24 @@ void SosStateTest::availableMovesTest(void)
 	
 void SosStateTest::isWhiteTurnTest(void)
 {
-	CPPUNIT_ASSERT(this->state->isWhiteTurn());
-	this->state->play(static_cast<SgMove>(5));
 	CPPUNIT_ASSERT(!this->state->isWhiteTurn());
+	this->state->play(static_cast<SgMove>(5));
+	CPPUNIT_ASSERT(this->state->isWhiteTurn());
 }
 
 void SosStateTest::playTest(void)
 {
 	this->state->play(static_cast<SgMove>(5));
-	std::vector<SgMove> whites = this->state->whiteMoves();
-	CPPUNIT_ASSERT(whites.size() == 1);
-	CPPUNIT_ASSERT_EQUAL(static_cast<int>(whites.at(0)),5);
+	std::vector<SgMove> blacks = this->state->blackMoves();
+	CPPUNIT_ASSERT(blacks.size() == 1);
+	CPPUNIT_ASSERT_EQUAL(static_cast<int>(blacks.at(0)),5);
 	CPPUNIT_ASSERT(static_cast<int>(this->state->availableMoves().size()) == 9);
-	CPPUNIT_ASSERT(!this->state->isWhiteTurn());
+	CPPUNIT_ASSERT(this->state->isWhiteTurn());
 }
 
 void SosStateTest::whiteMovesTest(void)
 {
+  this->state->setTurn(SG_WHITE);
 	this->state->play(static_cast<SgMove>(5));
 	std::vector<SgMove> whites = this->state->whiteMoves();
 	CPPUNIT_ASSERT(whites.size() == 1);
@@ -58,7 +59,6 @@ void SosStateTest::whiteMovesTest(void)
 
 void SosStateTest::blackMovesTest(void)
 {
-	this->state->play(static_cast<SgMove>(5));//white's move
 	this->state->play(static_cast<SgMove>(1));//black's move
 	std::vector<SgMove> blacks = this->state->blackMoves();
 	CPPUNIT_ASSERT(blacks.size() == 1);
@@ -72,8 +72,8 @@ void SosStateTest::sizeTest(void)
 
 void SosStateTest::undoTest(void)
 {	 
-	this->state->play(static_cast<SgMove>(5));//white's move
-	this->state->play(static_cast<SgMove>(1));//black's move
+	this->state->play(static_cast<SgMove>(5));//BLACK's move
+	this->state->play(static_cast<SgMove>(1));//white's move
 
 	this->state->undo(1);
 	std::vector<SgMove> avails = this->state->availableMoves();
@@ -121,11 +121,12 @@ void SosGameTest::twoPlayersGameTest(void)
 
 void SosGameTest::gameScoreTest(void)
 {
-	this->state->play(static_cast<SgMove>(1));//white's move
-	this->state->play(static_cast<SgMove>(2));//black's move
-	this->state->play(static_cast<SgMove>(3));//white's move
-	this->state->play(static_cast<SgMove>(0));//black's move
-	CPPUNIT_ASSERT (this->game->gameScore(*this->state) == 1.0);
+	this->state->play(static_cast<SgMove>(1));//black's move
+	this->state->play(static_cast<SgMove>(2));//white's move
+	this->state->play(static_cast<SgMove>(3));//black's move
+	this->state->play(static_cast<SgMove>(0));//white's move
+	CPPUNIT_ASSERT (this->game->gameScore(*this->state) == 0.0);
+        //difference not bigget than komi = 2
 }
 
 void SosGameTest::scoreBonusTest(void)
@@ -139,9 +140,9 @@ void SosGameTest::scoreBonusTest(void)
 
 void SosGameTest::winLossTest(void)
 {
-	this->state->play(static_cast<SgMove>(0));//white's move
-	this->state->play(static_cast<SgMove>(2));//black's move
-	this->state->play(static_cast<SgMove>(1));//white's move
-	this->state->play(static_cast<SgMove>(3));//black's move
+	this->state->play(static_cast<SgMove>(0));
+	this->state->play(static_cast<SgMove>(2));
+	this->state->play(static_cast<SgMove>(1));
+	this->state->play(static_cast<SgMove>(3));
 	CPPUNIT_ASSERT (this->game->winLoss(*this->state) == 0);
 }

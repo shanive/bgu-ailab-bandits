@@ -61,6 +61,10 @@ class SosState
   bool isWhiteTurn();
 
   /**
+     @ set next turn to be of the givven color
+  */
+  void setTurn(SgBlackWhite toplay);
+  /**
      play a move.
      @param move The move to play.
      @pre move is in this->avaiableMoves()
@@ -118,14 +122,18 @@ class SosGame
 
     ASCENDING,
 
-    DESCENDING
+    DESCENDING, 
+
+    SEMIRANDOM
 
   } ValuesOrder;
 
   /**
      constructor.
   */
-  explicit SosGame(int size, bool scoreBonus = false, ValuesOrder order = RANDOM, std::vector<int>* values = 0);
+  explicit SosGame(int size, bool scoreBonus = false, 
+                   ValuesOrder order = SEMIRANDOM, 
+                   std::vector<int>* values = 0);
 
   /**
      copy constructor.
@@ -175,7 +183,11 @@ class SosGame
   */
   int komi();
 
+  void setKomi(double komi);
+
  private:
+
+  double m_komi;
 
   /* The switches' values between 1 to this->m_gameSize */ 
   std::vector<int> m_switchValues;

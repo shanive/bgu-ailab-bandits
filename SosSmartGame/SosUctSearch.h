@@ -19,7 +19,12 @@ class SosUctThreadState
 	: public SgUctThreadState
 {
 public:
-   
+
+  /** The color of the player for whom the Evaluate() should 
+      calculate the score pf the game.
+  */
+  SgBlackWhite m_evalColor;
+
     /** Constructor.
 	@param threadId The number of the thread. Needed for passing to
 	constructor of SgUctThreadState.
@@ -27,7 +32,8 @@ public:
 	@param color The color of the corrent player.
 	@param state The current state of game.
     */
-    SosUctThreadState(unsigned int threadId, SgBlackWhite color, SosGame* game, SosState *state);
+    SosUctThreadState(unsigned int threadId, SgBlackWhite color, 
+                      SosGame* originGame, SosState* originState);
 
     virtual ~SosUctThreadState();
 
@@ -126,14 +132,17 @@ public:
 //     virtual void EndPlayout();
 // */
 private:
+    /*the color of the current player*/ 
+	SgBlackWhite m_color;
 	
 	bool m_isInPlayout;
+        /* the original game */
+	SosGame *m_originGame;
+        /* the original state */
+	SosState *m_originState;
+        /* will be synchronized with m_originState */
+        SosState *m_threadState;
 
-	SosGame *m_game;
-	/*the color of the current player*/ 
-	SgBlackWhite m_color;
-
-	SosState *m_gameState;
 
     // @} // name
 };

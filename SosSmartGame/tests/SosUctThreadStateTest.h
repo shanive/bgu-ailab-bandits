@@ -14,6 +14,7 @@ class SosState;
 class SosUctThreadStateTest : public CPPUNIT_NS :: TestFixture
 {
 	CPPUNIT_TEST_SUITE (SosUctThreadStateTest);
+        CPPUNIT_TEST (StartSearchTest);
 	CPPUNIT_TEST (EvaluateTest);
 	CPPUNIT_TEST (ExecuteTest);
 	CPPUNIT_TEST (ExecutePlayoutTest);
@@ -28,6 +29,7 @@ class SosUctThreadStateTest : public CPPUNIT_NS :: TestFixture
         	void tearDown (void);
 	
 	protected:
+                void StartSearchTest(void);
 		void EvaluateTest(void);
 		void ExecuteTest(void);
 		void ExecutePlayoutTest(void);

@@ -32,7 +32,7 @@ struct Conf {
   int profile;
   string outputfilename;
 
-  Conf(): size(10), repeat(1000), scorebonus(0), order(SosGame::RANDOM),
+  Conf(): size(10), repeat(1000), scorebonus(0), order(SosGame::SEMIRANDOM),
           min_sample(10), max_sample(100), sample_step(1.2),
           profile(0), outputfilename("tour.txt")
   {
@@ -67,11 +67,11 @@ void usage(){
    @return an instance of name type
 */
 SosPlayer* createPlayer(string classname, SosGame *game, double samples){
-  //if (classname.compare("random") == 0)
-    //return new SosRandomPlayer(game);
-  // if (classname.compare("left") == 0)
-    //return new SosLeftPlayer(game);
-  // if (classname.compare("UCT") == 0)
+  if (classname.compare("random") == 0)
+    return new SosRandomPlayer(game);
+  if (classname.compare("left") == 0)
+    return new SosLeftPlayer(game);
+  if (classname.compare("UCT") == 0)
     return new SosUctPlayer(game, static_cast<SgUctValue>(samples));
 }
 

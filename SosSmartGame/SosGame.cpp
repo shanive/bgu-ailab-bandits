@@ -11,7 +11,7 @@ using namespace std;
 	*/
 	SosState::SosState(int size)
 		: m_size(size),
-		  m_turn(SG_WHITE),
+		  m_turn(SG_BLACK),
 		  m_moves(size, GREY)					
 	{
 	
@@ -87,6 +87,11 @@ using namespace std;
 		return someMoves(BLACK);
 	}
 
+void SosState::setTurn(SgBlackWhite toplay)
+{
+  this->m_turn = toplay;
+}
+
 	/**
 	@return number of switches.
 	*/
@@ -127,10 +132,11 @@ using namespace std;
 //SosGame implementation
 
 	SosGame::SosGame(int size, bool scoreBonus /*= false */, 
-		ValuesOrder order /*= RANDOM */,
+		ValuesOrder order /*= SEMIRANDOM */,
 		std::vector<int>* values /*= 0 */)
 		: m_gameSize(size),
-		  m_scoreBonus(scoreBonus)
+		  m_scoreBonus(scoreBonus),
+                  m_komi(size/2)
 	{
 		if (values)
 			this->m_switchValues = (*values); //copy
@@ -178,6 +184,11 @@ using namespace std;
 	{
 		return (this->m_gameSize / 2);
 	}
+
+        void SosGame::setKomi(double komi)
+        {
+          this->m_komi = komi;
+        }
 			
 
 	double SosGame::gameScore(SosState state)
@@ -197,7 +208,7 @@ using namespace std;
 	int SosGame::winLoss(SosState state)
 	{
 		int diff = this->difference(state);
-		if (diff > 0)
+		if (diff > this->m_komi)
 			return 1;
 		else
 			return 0;
@@ -207,6 +218,20 @@ using namespace std;
 
 	void SosGame::initValues(ValuesOrder order)
 	{
+          if (order == SEMIRANDOM){
+            this->m_switchValues.push_back(0);
+            for(int i = 1; i < this->m_gameSize; i++)
+              {
+                if (i % 2 == 0){
+                  this->m_switchValues.push_back(
+                          this->m_switchValues.at(i-2)+1);
+                }else{
+                  this->m_switchValues.push_back(this->m_gameSize-
+                          this->m_switchValues.at(i-1)-1);
+                }
+              }
+              
+          }else{
 		for (int i = 0; i < this->m_gameSize; i++)
 		{
 			this->m_switchValues.push_back(i);
@@ -221,6 +246,7 @@ using namespace std;
 		else //order == RANDOM
 			std::random_shuffle(this->m_switchValues.begin(), 
 					this->m_switchValues.end());
+          }
 	}	
 
 	SosState SosGame::initialState()
@@ -244,14 +270,14 @@ using namespace std;
 		return sum;
 	}
 		
-
+//ddifference between black's score and white's score caus' black plays first 
 	int SosGame::difference(SosState state)
 	{
 		std::vector<SgMove> whites = state.whiteMoves();
 		std::vector<SgMove> blacks = state.blackMoves();
 		int whiteSum = this->valuesSum(whites);
 		int blackSum = this->valuesSum(blacks);
-		return whiteSum - blackSum;
+		return  blackSum - whiteSum;
 	}
 
 	

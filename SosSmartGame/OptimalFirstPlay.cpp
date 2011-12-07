@@ -38,7 +38,7 @@ double runSimulation(SosPlayer *player)
     count += isOptimalFirstPlay(move);
     delete state;
   }
-  return count/1000;
+  return count;
 }
   
 
