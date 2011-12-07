@@ -95,7 +95,7 @@ SgMove SosUctThreadState::GeneratePlayoutMove(bool& skipRaveUpdate)
 
 void SosUctThreadState::GameStart()
 {
-  
+  this->m_isInPlayout = false;
 }
 
 // void SosUctThreadState::StartPlayout()
@@ -112,6 +112,7 @@ void SosUctThreadState::StartPlayouts()
 void SosUctThreadState::StartSearch()
 {
   //sync m_threadState with m_originState
+  this->m_isInPlayout = false;
   if (this->m_threadState != 0){
     delete this->m_threadState;
     this->m_threadState = 0;
