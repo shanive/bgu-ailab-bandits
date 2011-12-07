@@ -95,13 +95,7 @@ SgMove SosUctThreadState::GeneratePlayoutMove(bool& skipRaveUpdate)
 
 void SosUctThreadState::GameStart()
 {
-   this->m_isInPlayout = false;
-     //sync m_threadState with m_originState
-  if (this->m_threadState != 0){
-    delete this->m_threadState;
-    this->m_threadState = 0;
-  }
-  this->m_threadState = new SosState(*this->m_originState);
+  
 }
 
 // void SosUctThreadState::StartPlayout()

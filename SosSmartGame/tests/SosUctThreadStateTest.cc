@@ -35,7 +35,7 @@ void SosUctThreadStateTest::StartSearchTest(void)
 
 void SosUctThreadStateTest::EvaluateTest(void)
 {
-  this->threadState->GameStart();
+  this->threadState->StartSearch();
   this->threadState->Execute(static_cast<SgMove>(2));//black's move
   this->threadState->Execute(static_cast<SgMove>(1));//white's move
   this->threadState->Execute(static_cast<SgMove>(3));//black's move
@@ -46,7 +46,7 @@ void SosUctThreadStateTest::EvaluateTest(void)
 
 void SosUctThreadStateTest::ExecuteTest(void)
 {
-  this->threadState->GameStart();
+  this->threadState->StartSearch();
   this->threadState->Execute(static_cast<SgMove>(2));
   std::vector<SgMove> blacks = this->state->blackMoves();
   //shoult not change origin state
@@ -59,7 +59,7 @@ void SosUctThreadStateTest::ExecuteTest(void)
  
 void SosUctThreadStateTest::ExecutePlayoutTest(void)
 {
-  this->threadState->GameStart();
+  this->threadState->StartSearch();
   this->threadState->StartPlayouts();
   this->threadState->ExecutePlayout(static_cast<SgMove>(2));
   std::vector<SgMove> blacks = this->state->blackMoves();
@@ -73,7 +73,7 @@ void SosUctThreadStateTest::ExecutePlayoutTest(void)
  
 void SosUctThreadStateTest::GenerateAllMovesTest(void)
 {
-  this->threadState->GameStart();
+  this->threadState->StartSearch();
   std::vector<SgUctMoveInfo> moves;
   SgUctProvenType provenType;
   CPPUNIT_ASSERT(!this->threadState->GenerateAllMoves(0, moves, provenType));
@@ -90,7 +90,7 @@ void SosUctThreadStateTest::GenerateAllMovesTest(void)
 
 void SosUctThreadStateTest::GeneratePlayoutMoveTest(void)
 {
-  this->threadState->GameStart();
+  this->threadState->StartSearch();
   bool rave;
   SgMove move = this->threadState->GeneratePlayoutMove(rave);
   std::vector<SgMove> avails = this->state->availableMoves();
@@ -99,7 +99,7 @@ void SosUctThreadStateTest::GeneratePlayoutMoveTest(void)
 
 void SosUctThreadStateTest::TakeBackInTreeTest(void)
 {
-  this->threadState->GameStart();
+  this->threadState->StartSearch();
   this->threadState->Execute(static_cast<SgMove>(2));//white's move
   this->threadState->Execute(static_cast<SgMove>(1));
   this->threadState->TakeBackInTree(2);
@@ -108,7 +108,7 @@ void SosUctThreadStateTest::TakeBackInTreeTest(void)
 
 void SosUctThreadStateTest::TakeBackPlayoutTest(void)
 {
-  this->threadState->GameStart();
+  this->threadState->StartSearch();
   this->threadState->Execute(static_cast<SgMove>(2));//white's move
   this->threadState->Execute(static_cast<SgMove>(1));
   this->threadState->TakeBackPlayout(2);
