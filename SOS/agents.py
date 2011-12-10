@@ -88,7 +88,7 @@ class MCTS(Agent):
 			print "%d,%d" % (self.game.values[move], stat.count),
 		print
 
-	def __simulate(self, select, state, stats,):
+	def __simulate(self, select, state, stats):
 		"""simulate a game from a given state. return the score bonus"""
 
 		if self.game.isFinalState(state):

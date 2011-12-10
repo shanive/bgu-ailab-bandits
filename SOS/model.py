@@ -50,6 +50,9 @@ class State:
                         self.movememo[stateid] = self.__someMoves(State.GRAY)
                 return self.movememo[stateid]
         
+		def set_turn(self, color):
+			self.turn = color
+
         def __move(self, i, color):
                 assert self.colors[i]==State.GRAY
                 self.colors[i] = color
