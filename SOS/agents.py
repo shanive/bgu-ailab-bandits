@@ -8,6 +8,7 @@ from copy import copy
 
 printSamplingStats = False
 computeCp = None
+Pg = 0.5
 
 class Random(Agent):
 	"""random algorithm for playing sos game."""
@@ -127,7 +128,7 @@ def selectGreedy(state, stats):
 	"""select best move with probability 0.5,
 	or another move with uniform probability"""
 	moves = state.availableMoves()
-	if len(moves)==1 or random() > 0.5 * len(moves)/(len(moves)-1):
+	if len(moves)==1 or random() > Pg * len(moves)/(len(moves)-1):
 		return bestMove(state, stats)
 	else:
 		return choice(moves)
@@ -154,7 +155,7 @@ def selectUCB(state, stats):
 def selectUQB(state, stats):
 	Cp = computeCp(state) # approximate upper bound
 	totalcount = sum(stat.count for stat in stats[state].values())
-	A = 2.0*Cp*sqrt(sqrt(totalcount))
+	A = 1.0*Cp*sqrt(sqrt(totalcount))
 	def uqb(stat):
 		return stat.getAvgValue()+A/sqrt(stat.count)
 	return reduce(lambda a, b: uqb(a[1])>uqb(b[1]) and a or b,
@@ -190,6 +191,23 @@ def voiHoeffding(stat, alpha, beta):
 
 def selectHoeffding(state, stats):
 	return selectVOI(state, stats, voiHoeffding)
+
+def voiLoeffding(stat, alpha, beta):
+
+	def estimate(n, over, under):
+		if over>0:
+			return log(over) - 0.5*n*under*under - log(n)
+		else:
+			return -1E37
+
+	avg = stat.getAvgValue()
+	voi = avg > beta \
+		and estimate(stat.count, 1+beta, avg-beta) \
+		or estimate(stat.count, 1-alpha, alpha-avg)
+	return voi
+
+def selectLoeffding(state, stats):
+	return selectVOI(state, stats, voiLoeffding)
 
 # Hoeffding with Eyal's correction
 def bisection(f, a, b, eps):
@@ -243,6 +261,11 @@ class HCT(MCTS):
 	"Hoeffding VOI then UCT"
 	def __init__(self, game, samples):
 		MCTS.__init__(self, game, samples, selectHoeffding, selectUCB)
+
+class LCT(MCTS):
+	"Log-Hoeffding VOI then UCT"
+	def __init__(self, game, samples):
+		MCTS.__init__(self, game, samples, selectLoeffding, selectUCB)
 
 class HRT(MCTS):
 	"Hoeffding VOI then Random"

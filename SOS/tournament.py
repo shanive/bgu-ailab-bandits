@@ -64,13 +64,16 @@ def parseCommandLine(argList):
     parser.add_option("--order", type = "int", dest = "order", default = 0, help = "switches' values order [default: %default]") ##### todo
     parser.add_option("--scorebonus", action = "store_true", dest = "scorebonus", default = False, help = "players' reward [default: %default]" )
     parser.add_option("--Cp", type = "float", dest = "Cp", help = "cp value in UCT function" )
+    parser.add_option("--Pg", type = "float", dest = "Pg", help = "Greedy sampling probability (1-Pg for best, Pg for rest)" )
     parser.add_option("--profile", action = "store_true", dest = "profile", default = False, help = "print profile [default: %default]")
     
     (options, args) = parser.parse_args()
 
     if options.Cp:
 	    agents.computeCp = lambda state: options.Cp
-    elif options.scorebonus:
+    if options.Pg:
+       agents.Pg = options.Pg
+    if options.scorebonus:
 	    agents.computeCp = agents.computeCpScoreBonus
     else:
 	    agents.computeCp = agents.computeCpWinLoss
@@ -105,7 +108,7 @@ def simulation(conf, samples):
 				results[i]+= avgDiff
 				results[j]-= avgDiff
 	return results
-        
+	
 def runTournament(conf):
     """excecute the tournament and print results. """
  
@@ -116,20 +119,20 @@ def runTournament(conf):
     
     samples = conf.min_samples_per_action
     while samples <= conf.max_samples_per_action:
-        results = simulation(conf, int(round(samples)))
+	results = simulation(conf, int(round(samples)))
 
-        ##print next line of results
-        print "%-10d" % samples,
+	##print next line of results
+	print "%-10d" % samples,
 	for result in results: print "%-10f" % result,
 	print
 
-        samples *= conf.sample_step  
+	samples *= conf.sample_step  
 
-def profileTournament(conf):        
-        """run the tournament with profiling"""
-        cProfile.run('runTournament(conf)','profile')
-        profile = pstats.Stats('profile')
-        profile.sort_stats('time').print_stats(0.5)
+def profileTournament(conf):	    
+	"""run the tournament with profiling"""
+	cProfile.run('runTournament(conf)','profile')
+	profile = pstats.Stats('profile')
+	profile.sort_stats('time').print_stats(0.5)
        
 if __name__ == '__main__':
 	conf = parseCommandLine(sys.argv[1:])
@@ -139,7 +142,7 @@ if __name__ == '__main__':
 	# profiling commented out temporarily, please implement
     # with command line option
 	if conf.profile:
-                profileTournament(conf)
+		profileTournament(conf)
 	else:
 		runTournament(conf)
 
